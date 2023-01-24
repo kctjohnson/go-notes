@@ -1,0 +1,4 @@
+.env
+Makefile
+debug.log
+docker-compose.yml

@@ -4,6 +4,7 @@ import (
 	"context"
 	"go-notes/pkg/db/model"
 	"go-notes/pkg/db/repositories"
+	"log"
 )
 
 type NotesService struct {
@@ -25,5 +26,6 @@ func (s *NotesService) GetNote(ctx context.Context, id int64) (model.Note, error
 }
 
 func (s *NotesService) CreateNote(ctx context.Context, title string) (model.Note, error) {
+	log.Printf("%#v\n", s)
 	return s.NotesRepository.CreateNote(ctx, title)
 }

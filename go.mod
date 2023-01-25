@@ -4,10 +4,14 @@ go 1.19
 
 require github.com/charmbracelet/bubbletea v0.23.1
 
-require github.com/jmoiron/sqlx v1.3.5 // indirect
+require (
+	github.com/charmbracelet/lipgloss v0.6.0 // indirect
+	github.com/jmoiron/sqlx v1.3.5 // indirect
+)
 
 require (
 	github.com/aymanbagabas/go-osc52 v1.0.3 // indirect
+	github.com/charmbracelet/bubbles v0.15.0
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/go-sql-driver/mysql v1.7.0
 	github.com/joho/godotenv v1.4.0

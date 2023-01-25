@@ -1,7 +1,6 @@
 package models
 
 import (
-	"context"
 	"go-notes/cmd/cli/utils"
 	"go-notes/pkg/services"
 	"log"
@@ -27,7 +26,7 @@ type Main struct {
 func NewMain(ns *services.NotesService) *Main {
 	return &Main{
 		noteService: ns,
-		list:        List{},
+		list:        *NewList(listKeys, ns),
 		edit:        Edit{},
 		curFocus:    LOADING,
 	}
@@ -38,7 +37,7 @@ func (m Main) Init() tea.Cmd {
 }
 
 func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// Global keybindings
+	var cmds tea.Cmd
 	switch msg := msg.(type) {
 	case utils.FailedToLoadNotesMsg:
 		log.Fatalf("Failed to load notes!\nError: %v\n", msg)
@@ -46,23 +45,20 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case utils.LoadedNotesMsg:
 		m.list.notes = msg
 		m.curFocus = LIST
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "enter":
-			_, err := m.noteService.CreateNote(context.Background(), "This is the title!")
-			if err != nil {
-				log.Fatalf("Error: %v\n", err)
-				return m, tea.Quit
-			}
-			m.curFocus = LOADING
-			return m, utils.LoadNotesCmd(m.noteService)
-		case "ctrl+c":
-			return m, tea.Quit
-		}
+	case utils.FailedToCreateNoteMsg:
+		log.Fatalf("Failed to create note!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.CreatedNoteMsg:
+		m.curFocus = LOADING
+		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.noteService))
 	}
-	// Switch through context specific bindings
-	// Message handlers
-	return m, nil
+
+	// Update all of the delegated models
+	temp, cmd := m.modelUpdate(msg)
+	m = temp.(Main)
+	cmds = tea.Batch(cmds, cmd)
+
+	return m, cmds
 }
 
 func (m Main) View() string {
@@ -76,4 +72,19 @@ func (m Main) View() string {
 	default:
 		return "I'm not sure what else we should be doing, but here we are!"
 	}
+}
+
+// Keybindings that are local to each model
+func (m Main) modelUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch m.curFocus {
+	case LIST:
+		listModel, cmd := m.list.Update(msg)
+		m.list = listModel.(List)
+		return m, cmd
+	case EDIT:
+		editModel, cmd := m.edit.Update(msg)
+		m.edit = editModel.(Edit)
+		return m, cmd
+	}
+	return m, nil
 }

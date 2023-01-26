@@ -50,6 +50,6 @@ var listKeys = listKeymap{
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "esc", "ctrl+c"),
-		key.WithHelp("q", "quit"),
+		key.WithHelp("esc", "quit"),
 	),
 }

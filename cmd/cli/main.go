@@ -43,7 +43,7 @@ func main() {
 
 	// Start the charm CLI UI
 	mainModel := models.NewMain(notesService)
-	program := tea.NewProgram(mainModel, tea.WithAltScreen())
+	program := tea.NewProgram(mainModel)
 	if _, err := program.Run(); err != nil {
 		fmt.Printf("Failed to run program: %v", err)
 		os.Exit(1)

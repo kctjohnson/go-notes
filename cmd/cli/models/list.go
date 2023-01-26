@@ -40,6 +40,9 @@ func (m List) Init() tea.Cmd {
 }
 
 func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// Constrain the cursor to prevent it from going out of bounds
+	m.constrainCursor()
+
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.help.Width = msg.Width
@@ -49,12 +52,16 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.cursorUp()
 		case key.Matches(msg, m.keys.Down):
 			m.cursorDown()
+		case key.Matches(msg, m.keys.New):
+			return m, utils.CreateNoteCmd(m.noteService, "New Note Title")
+		case key.Matches(msg, m.keys.Delete):
+			return m, utils.DeleteNoteCmd(m.noteService, m.notes[m.cursor].ID)
+		case key.Matches(msg, m.keys.Select):
+			return m, utils.EditNoteCmd(m.noteService, m.notes[m.cursor].ID)
 		case key.Matches(msg, m.keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
-		case key.Matches(msg, m.keys.New):
-			return m, utils.CreateNoteCmd(m.noteService, "New Note Title")
 		}
 	}
 	return m, nil
@@ -92,5 +99,15 @@ func (m *List) cursorDown() {
 		m.scrollIndex++
 	} else {
 		m.cursor++
+	}
+}
+
+func (m *List) constrainCursor() {
+	if m.cursor < 0 {
+		m.cursor = 0
+	}
+
+	if m.cursor >= len(m.notes) {
+		m.cursor = len(m.notes) - 1
 	}
 }

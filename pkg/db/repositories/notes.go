@@ -85,6 +85,30 @@ func (r *NotesRepository) CreateNote(ctx context.Context, title string) (model.N
 	return note, nil
 }
 
-func (r *NotesRepository) DeleteNote(ctx context.Context) error {
-	return nil
+func (r *NotesRepository) SaveNote(ctx context.Context, note model.Note) (model.Note, error) {
+	const saveNoteSql = `
+		UPDATE notes
+		SET title=:title, content=:content, last_edited_date=:last_edited_date
+		WHERE id=:id
+	`
+
+	note.LastEditedDate = time.Now()
+
+	_, err := r.db.NamedExecContext(ctx, saveNoteSql, note)
+	if err != nil {
+		return note, err
+	}
+
+	newNote, err := r.GetNote(ctx, note.ID)
+	if err != nil {
+		return newNote, err
+	}
+
+	return newNote, nil
+}
+
+func (r *NotesRepository) DeleteNote(ctx context.Context, id int64) error {
+	const deleteNoteSql = `DELETE FROM notes WHERE id=?`
+	_, err := r.db.ExecContext(ctx, deleteNoteSql, id)
+	return err
 }

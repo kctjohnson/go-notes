@@ -11,10 +11,47 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
-	"github.com/joho/godotenv"
+	"github.com/spf13/viper"
 )
 
+func initConfig() {
+	// Set up the config
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.AddConfigPath("$HOME/.config/gonotes/")
+	err := viper.ReadInConfig()
+
+	// If it failed to read in the config, create a new blank one
+	if err != nil {
+		fmt.Printf("Creating blank config file at $HOME/.config/gonotes\n")
+		homeDir, err := os.UserHomeDir()
+		if err != nil {
+			panic(err)
+		}
+
+		configPath := "/.config/gonotes/"
+		configName := "config.json"
+
+		configData, err := os.ReadFile("example_config.json")
+		if err != nil {
+			panic(err)
+		}
+
+		err = os.MkdirAll(homeDir+configPath, os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+
+		dir := homeDir + configPath + configName
+		err = os.WriteFile(dir, configData, 0777)
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
 func main() {
+
 	// Set up logging
 	f, err := tea.LogToFile("debug.log", "debug")
 	if err != nil {
@@ -24,12 +61,15 @@ func main() {
 	defer f.Close()
 
 	// Set up env vars
-	err = godotenv.Load(".env")
-	if err != nil {
-		panic(err)
-	}
+	initConfig()
 
-	dsn := os.Getenv("DSN")
+	dbUser := viper.GetString("db.user")
+	dbPassword := viper.GetString("db.password")
+	dbIP := viper.GetString("db.ip")
+	dbPort := viper.GetString("db.port")
+
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/gonotes?parseTime=true", dbUser, dbPassword, dbIP, dbPort)
+
 	log.Printf("%s\n", dsn)
 
 	// Set up the DB

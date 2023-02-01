@@ -19,6 +19,7 @@ type List struct {
 	preview viewport.Model
 	help    help.Model
 
+	width        int
 	cursor       int
 	scrollIndex  int
 	maxViewNotes int
@@ -41,6 +42,7 @@ func NewList(keys listKeymap, ns *services.NotesService) *List {
 		keys:         keys,
 		preview:      preview,
 		help:         help.New(),
+		width:        0,
 		cursor:       0,
 		scrollIndex:  0,
 		maxViewNotes: 15,
@@ -58,6 +60,7 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
+		m.width = msg.Width
 		m.help.Width = msg.Width
 		m.preview.Width = msg.Width - lipgloss.Width(m.View()) - 2
 	case tea.KeyMsg:
@@ -80,6 +83,7 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, utils.EditNoteCmd(m.noteService, m.notes[m.cursor].ID)
 		case key.Matches(msg, m.keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
+			m.preview.Width = m.width - lipgloss.Width(m.View()) - 2
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
 		}

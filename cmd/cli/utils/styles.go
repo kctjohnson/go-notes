@@ -8,4 +8,7 @@ var (
 				Bold(true)
 	TitleStyle = lipgloss.NewStyle().
 			Underline(true)
+	PreviewStyle = lipgloss.NewStyle().
+			Border(lipgloss.RoundedBorder(), false, false, false, true).
+			PaddingLeft(1).MarginLeft(1)
 )

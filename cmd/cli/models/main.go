@@ -102,6 +102,13 @@ func (m Main) View() string {
 
 // Keybindings that are local to each model
 func (m Main) modelUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// Delegate the window size messages
+	if _, ok := msg.(tea.WindowSizeMsg); ok {
+		listModel, cmd := m.list.Update(msg)
+		m.list = listModel.(List)
+		return m, cmd
+	}
+
 	switch m.curFocus {
 	case LIST:
 		listModel, cmd := m.list.Update(msg)

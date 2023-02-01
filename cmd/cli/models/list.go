@@ -8,13 +8,16 @@ import (
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 type List struct {
-	notes []model.Note
-	keys  listKeymap
-	help  help.Model
+	notes   []model.Note
+	keys    listKeymap
+	preview viewport.Model
+	help    help.Model
 
 	cursor       int
 	scrollIndex  int
@@ -24,9 +27,19 @@ type List struct {
 }
 
 func NewList(keys listKeymap, ns *services.NotesService) *List {
+	// Disable the built in viewport keybindings
+	preview := viewport.New(40, 15)
+	preview.KeyMap.Down.SetEnabled(false)
+	preview.KeyMap.Up.SetEnabled(false)
+	preview.KeyMap.PageDown.SetEnabled(false)
+	preview.KeyMap.PageUp.SetEnabled(false)
+	preview.KeyMap.HalfPageDown.SetEnabled(false)
+	preview.KeyMap.HalfPageUp.SetEnabled(false)
+
 	return &List{
 		notes:        []model.Note{},
 		keys:         keys,
+		preview:      preview,
 		help:         help.New(),
 		cursor:       0,
 		scrollIndex:  0,
@@ -46,12 +59,19 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.help.Width = msg.Width
+		m.preview.Width = msg.Width - lipgloss.Width(m.View()) - 2
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.keys.Up):
 			m.cursorUp()
+			m.preview.GotoTop()
 		case key.Matches(msg, m.keys.Down):
 			m.cursorDown()
+			m.preview.GotoTop()
+		case key.Matches(msg, m.keys.ViewUp):
+			m.preview.LineUp(1)
+		case key.Matches(msg, m.keys.ViewDown):
+			m.preview.LineDown(1)
 		case key.Matches(msg, m.keys.New):
 			return m, utils.CreateNoteCmd(m.noteService, "New Note Title")
 		case key.Matches(msg, m.keys.Delete):
@@ -64,10 +84,24 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		}
 	}
-	return m, nil
+
+	// Update the height of the preview
+	if len(m.notes) > 0 {
+		contentHeight := lipgloss.Height(m.listView())
+		m.preview.Height = contentHeight
+		m.preview.SetContent(m.notes[m.cursor].Content)
+	}
+	previewModel, cmd := m.preview.Update(msg)
+	m.preview = previewModel
+
+	return m, cmd
 }
 
 func (m List) View() string {
+	return lipgloss.JoinHorizontal(lipgloss.Top, m.listView(), m.previewView())
+}
+
+func (m List) listView() string {
 	str := utils.TitleStyle.Render("Notes:") + "\n"
 	for row := m.scrollIndex; row < len(m.notes) && row < m.scrollIndex+m.maxViewNotes; row++ {
 		if row == m.cursor {
@@ -78,6 +112,10 @@ func (m List) View() string {
 	}
 	str += "\n" + m.help.View(listKeys)
 	return str
+}
+
+func (m List) previewView() string {
+	return utils.PreviewStyle.Render(m.preview.View())
 }
 
 func (m *List) cursorUp() {

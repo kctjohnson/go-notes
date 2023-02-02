@@ -3,6 +3,7 @@
     "user": "",
     "password": "",
     "ip": "",
-    "port": ""
+    "port": "",
+    "database": "gonotes"
   }
 }

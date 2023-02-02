@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go-notes/cmd/cli/models"
+	"go-notes/cmd/gonotes/models"
 	"go-notes/pkg/db/repositories"
 	"go-notes/pkg/services"
 	"log"

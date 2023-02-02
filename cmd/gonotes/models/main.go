@@ -3,7 +3,7 @@ package models
 import (
 	"bufio"
 	"fmt"
-	"go-notes/cmd/cli/utils"
+	"go-notes/cmd/gonotes/utils"
 	"go-notes/pkg/db/model"
 	"go-notes/pkg/services"
 	"log"

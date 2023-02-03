@@ -1,7 +1,6 @@
 package graphql
 
 import (
-	"fmt"
 	"go-notes/cmd/gonotes-server/graphql/inputs"
 	"go-notes/pkg/db/model"
 	"go-notes/pkg/services"
@@ -28,7 +27,15 @@ func (g *NotesGql) registerQuery(querySchemaObj *schemabuilder.Object) {
 }
 
 func (g *NotesGql) registerMutation(mutationSchemaObj *schemabuilder.Object) {
-	mutationSchemaObj.FieldFunc("nothin", func() {
-		fmt.Printf("Yeet")
+	mutationSchemaObj.FieldFunc("createNote", func(args struct{ Title string }) (model.Note, error) {
+		return g.NotesService.CreateNote(args.Title)
+	})
+
+	mutationSchemaObj.FieldFunc("saveNote", func(args struct{ Note model.Note }) (model.Note, error) {
+		return g.NotesService.SaveNote(args.Note)
+	})
+
+	mutationSchemaObj.FieldFunc("deleteNote", func(args struct{ ID int64 }) error {
+		return g.NotesService.DeleteNote(args.ID)
 	})
 }

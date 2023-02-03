@@ -1,0 +1,68 @@
+""""""
+type Mutation {
+  """"""
+  createNote(title: string!): Note! @deprecated(reason: "")
+
+  """"""
+  deleteNote(iD: int64!): bool! @deprecated(reason: "")
+
+  """"""
+  saveNote(note: Note_InputObject!): Note! @deprecated(reason: "")
+}
+
+""""""
+type Note {
+  """"""
+  content: string! @deprecated(reason: "")
+
+  """"""
+  created_date: Time! @deprecated(reason: "")
+
+  """"""
+  id: int64! @deprecated(reason: "")
+
+  """"""
+  last_edited_date: Time! @deprecated(reason: "")
+
+  """"""
+  title: string! @deprecated(reason: "")
+}
+
+""""""
+input Note_InputObject {
+  """"""
+  content: string!
+
+  """"""
+  created_date: Time!
+
+  """"""
+  id: int64!
+
+  """"""
+  last_edited_date: Time!
+
+  """"""
+  title: string!
+}
+
+""""""
+type Query {
+  """"""
+  note(id: int64!): Note! @deprecated(reason: "")
+
+  """"""
+  notes: [Note!]! @deprecated(reason: "")
+}
+
+""""""
+scalar Time
+
+""""""
+scalar bool
+
+""""""
+scalar int64
+
+""""""
+scalar string

@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"context"
 	"go-notes/pkg/db/model"
 	"go-notes/pkg/services"
 	"os"
@@ -14,7 +13,7 @@ type LoadedNotesMsg []model.Note
 
 func LoadNotesCmd(ns *services.NotesService) tea.Cmd {
 	return func() tea.Msg {
-		notes, err := ns.GetNotes(context.Background())
+		notes, err := ns.GetNotes()
 		if err != nil {
 			return FailedToLoadNotesMsg(err)
 		} else {
@@ -28,7 +27,7 @@ type CreatedNoteMsg model.Note
 
 func CreateNoteCmd(ns *services.NotesService, title string) tea.Cmd {
 	return func() tea.Msg {
-		note, err := ns.CreateNote(context.Background(), "This is the title!")
+		note, err := ns.CreateNote("This is the title!")
 		if err != nil {
 			return FailedToCreateNoteMsg(err)
 		}
@@ -46,7 +45,7 @@ type SaveEditsMsg struct {
 
 func EditNoteCmd(ns *services.NotesService, id int64) tea.Cmd {
 	return func() tea.Msg {
-		note, err := ns.GetNote(context.Background(), id)
+		note, err := ns.GetNote(id)
 		if err != nil {
 			return FailedToEditNoteMsg(err)
 		}
@@ -59,7 +58,7 @@ type SaveNoteMsg model.Note
 
 func SaveNoteCmd(ns *services.NotesService, note model.Note) tea.Cmd {
 	return func() tea.Msg {
-		updatedNote, err := ns.SaveNote(context.Background(), note)
+		updatedNote, err := ns.SaveNote(note)
 		if err != nil {
 			return FailedToSaveNoteMsg(err)
 		}
@@ -72,7 +71,7 @@ type DeletedNoteMsg int64
 
 func DeleteNoteCmd(ns *services.NotesService, id int64) tea.Cmd {
 	return func() tea.Msg {
-		err := ns.DeleteNote(context.Background(), id)
+		err := ns.DeleteNote(id)
 		if err != nil {
 			return FailedToDeleteNoteMsg(err)
 		}

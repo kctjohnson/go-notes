@@ -1,7 +1,6 @@
 package services
 
 import (
-	"context"
 	"go-notes/pkg/db/model"
 	"go-notes/pkg/db/repositories"
 )
@@ -16,22 +15,22 @@ func NewNotesService(r *repositories.NotesRepository) *NotesService {
 	}
 }
 
-func (s *NotesService) GetNotes(ctx context.Context) ([]model.Note, error) {
-	return s.NotesRepository.GetNotes(ctx)
+func (s *NotesService) GetNotes() ([]model.Note, error) {
+	return s.NotesRepository.GetNotes()
 }
 
-func (s *NotesService) GetNote(ctx context.Context, id int64) (model.Note, error) {
-	return s.NotesRepository.GetNote(ctx, id)
+func (s *NotesService) GetNote(id int64) (model.Note, error) {
+	return s.NotesRepository.GetNote(id)
 }
 
-func (s *NotesService) CreateNote(ctx context.Context, title string) (model.Note, error) {
-	return s.NotesRepository.CreateNote(ctx, title)
+func (s *NotesService) CreateNote(title string) (model.Note, error) {
+	return s.NotesRepository.CreateNote(title)
 }
 
-func (s *NotesService) SaveNote(ctx context.Context, note model.Note) (model.Note, error) {
-	return s.NotesRepository.SaveNote(ctx, note)
+func (s *NotesService) SaveNote(note model.Note) (model.Note, error) {
+	return s.NotesRepository.SaveNote(note)
 }
 
-func (s *NotesService) DeleteNote(ctx context.Context, id int64) error {
-	return s.NotesRepository.DeleteNote(ctx, id)
+func (s *NotesService) DeleteNote(id int64) error {
+	return s.NotesRepository.DeleteNote(id)
 }

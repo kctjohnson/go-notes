@@ -1,7 +1,6 @@
 package repositories
 
 import (
-	"context"
 	"go-notes/pkg/db/model"
 	"time"
 
@@ -18,9 +17,9 @@ func NewNotesRepository(db *sqlx.DB) *NotesRepository {
 	}
 }
 
-func (r *NotesRepository) GetNotes(ctx context.Context) ([]model.Note, error) {
+func (r *NotesRepository) GetNotes() ([]model.Note, error) {
 	const getNotesSql = `SELECT * FROM notes`
-	rows, err := r.db.QueryxContext(ctx, getNotesSql)
+	rows, err := r.db.Queryx(getNotesSql)
 	if err != nil {
 		return nil, err
 	}
@@ -43,9 +42,9 @@ func (r *NotesRepository) GetNotes(ctx context.Context) ([]model.Note, error) {
 	return notes, nil
 }
 
-func (r *NotesRepository) GetNote(ctx context.Context, id int64) (model.Note, error) {
+func (r *NotesRepository) GetNote(id int64) (model.Note, error) {
 	const getNoteSql = `SELECT * FROM notes WHERE id=?`
-	row := r.db.QueryRowxContext(ctx, getNoteSql, id)
+	row := r.db.QueryRowx(getNoteSql, id)
 	var note model.Note
 	err := row.StructScan(&note)
 	if err != nil {
@@ -54,7 +53,7 @@ func (r *NotesRepository) GetNote(ctx context.Context, id int64) (model.Note, er
 	return note, nil
 }
 
-func (r *NotesRepository) CreateNote(ctx context.Context, title string) (model.Note, error) {
+func (r *NotesRepository) CreateNote(title string) (model.Note, error) {
 	const createNoteSql = `
 	INSERT INTO notes (title, content, created_date, last_edited_date)
 	VALUES (:title, :content, :created_date, :last_edited_date)
@@ -67,7 +66,7 @@ func (r *NotesRepository) CreateNote(ctx context.Context, title string) (model.N
 		LastEditedDate: curDate,
 	}
 
-	res, err := r.db.NamedExecContext(ctx, createNoteSql, newNote)
+	res, err := r.db.NamedExec(createNoteSql, newNote)
 	if err != nil {
 		return model.Note{}, err
 	}
@@ -77,7 +76,7 @@ func (r *NotesRepository) CreateNote(ctx context.Context, title string) (model.N
 		return model.Note{}, err
 	}
 
-	note, err := r.GetNote(ctx, id)
+	note, err := r.GetNote(id)
 	if err != nil {
 		return note, err
 	}
@@ -85,7 +84,7 @@ func (r *NotesRepository) CreateNote(ctx context.Context, title string) (model.N
 	return note, nil
 }
 
-func (r *NotesRepository) SaveNote(ctx context.Context, note model.Note) (model.Note, error) {
+func (r *NotesRepository) SaveNote(note model.Note) (model.Note, error) {
 	const saveNoteSql = `
 		UPDATE notes
 		SET title=:title, content=:content, last_edited_date=:last_edited_date
@@ -94,12 +93,12 @@ func (r *NotesRepository) SaveNote(ctx context.Context, note model.Note) (model.
 
 	note.LastEditedDate = time.Now()
 
-	_, err := r.db.NamedExecContext(ctx, saveNoteSql, note)
+	_, err := r.db.NamedExec(saveNoteSql, note)
 	if err != nil {
 		return note, err
 	}
 
-	newNote, err := r.GetNote(ctx, note.ID)
+	newNote, err := r.GetNote(note.ID)
 	if err != nil {
 		return newNote, err
 	}
@@ -107,8 +106,8 @@ func (r *NotesRepository) SaveNote(ctx context.Context, note model.Note) (model.
 	return newNote, nil
 }
 
-func (r *NotesRepository) DeleteNote(ctx context.Context, id int64) error {
+func (r *NotesRepository) DeleteNote(id int64) error {
 	const deleteNoteSql = `DELETE FROM notes WHERE id=?`
-	_, err := r.db.ExecContext(ctx, deleteNoteSql, id)
+	_, err := r.db.Exec(deleteNoteSql, id)
 	return err
 }

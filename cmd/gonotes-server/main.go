@@ -1,25 +1,42 @@
 package main
 
 import (
-	"fmt"
+	gographql "go-notes/cmd/gonotes-server/graphql"
+	"go-notes/pkg/db/repositories"
+	"go-notes/pkg/services"
+	"net/http"
 	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/samsarahq/thunder/graphql"
+	"github.com/samsarahq/thunder/graphql/introspection"
 )
 
-func main() {
-	fmt.Printf("This app will eventually handle creating and handling all\n")
-	fmt.Printf("note related server requests with a sqlite database rather than MySQL.\n")
-	fmt.Printf("This will allow the user to just run the server wherever they'd like,\n")
-	fmt.Printf("and then they can use the note app like normal, whether the notes are\n")
-	fmt.Printf("stored locally or on a server.\n")
+type Application struct {
+	gqlServer *gographql.GQLServer
+}
 
+func main() {
 	db, err := openDB()
 	if err != nil {
 		panic(err)
 	}
 	defer db.Close()
+
+	nr := repositories.NewNotesRepository(db)
+	ns := services.NewNotesService(nr)
+	gql := gographql.GQLServer{
+		NotesGql: &gographql.NotesGql{
+			NotesService: ns,
+		},
+	}
+
+	schema := gql.Schema()
+	introspection.AddIntrospectionToSchema(schema)
+
+	http.Handle("/graphql", corsHandler(graphql.HTTPHandler(schema)))
+	http.ListenAndServe(":3030", nil)
 }
 
 func openDB() (*sqlx.DB, error) {
@@ -39,4 +56,13 @@ func openDB() (*sqlx.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+func corsHandler(h http.Handler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		h.ServeHTTP(w, r)
+	}
 }

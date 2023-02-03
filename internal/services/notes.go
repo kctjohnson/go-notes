@@ -1,8 +1,8 @@
 package services
 
 import (
-	"go-notes/pkg/db/model"
-	"go-notes/pkg/db/repositories"
+	"go-notes/internal/db/model"
+	"go-notes/internal/db/repositories"
 )
 
 type NotesService struct {

@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"go-notes/pkg/db/model"
-	"go-notes/pkg/services"
+	"go-notes/internal/db/model"
+	"go-notes/internal/services"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"

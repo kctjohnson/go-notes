@@ -1,7 +1,7 @@
 package repositories
 
 import (
-	"go-notes/pkg/db/model"
+	"go-notes/internal/db/model"
 	"time"
 
 	"github.com/jmoiron/sqlx"

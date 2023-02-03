@@ -2,8 +2,8 @@ package main
 
 import (
 	gographql "go-notes/cmd/gonotes-server/graphql"
-	"go-notes/pkg/db/repositories"
-	"go-notes/pkg/services"
+	"go-notes/internal/db/repositories"
+	"go-notes/internal/services"
 	"net/http"
 	"os"
 

@@ -3,8 +3,8 @@ package models
 import (
 	"fmt"
 	"go-notes/cmd/gonotes/utils"
-	"go-notes/pkg/db/model"
-	"go-notes/pkg/services"
+	"go-notes/internal/db/model"
+	"go-notes/internal/services"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"

@@ -2,8 +2,8 @@ package graphql
 
 import (
 	"go-notes/cmd/gonotes-server/graphql/inputs"
-	"go-notes/pkg/db/model"
-	"go-notes/pkg/services"
+	"go-notes/internal/db/model"
+	"go-notes/internal/services"
 
 	"github.com/samsarahq/thunder/graphql/schemabuilder"
 )

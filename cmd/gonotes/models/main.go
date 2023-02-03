@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"go-notes/cmd/gonotes/utils"
 	"go-notes/internal/db/model"
-	"go-notes/internal/services"
+	"go-notes/internal/graphql"
 	"log"
 	"os"
 	"os/exec"
@@ -23,21 +23,21 @@ const (
 )
 
 type Main struct {
-	noteService *services.NotesService
-	list        List
-	curFocus    FocusEnum
+	gqlClient *graphql.Client
+	list      List
+	curFocus  FocusEnum
 }
 
-func NewMain(ns *services.NotesService) *Main {
+func NewMain(gqlClient *graphql.Client) *Main {
 	return &Main{
-		noteService: ns,
-		list:        *NewList(listKeys, ns),
-		curFocus:    LOADING,
+		gqlClient: gqlClient,
+		list:      *NewList(listKeys, gqlClient),
+		curFocus:  LOADING,
 	}
 }
 
 func (m Main) Init() tea.Cmd {
-	return utils.LoadNotesCmd(m.noteService)
+	return utils.LoadNotesCmd(m.gqlClient)
 }
 
 func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
@@ -54,7 +54,7 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	case utils.CreatedNoteMsg:
 		m.curFocus = LOADING
-		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.noteService))
+		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
 	case utils.FailedToEditNoteMsg:
 		log.Fatalf("Failed to edit note!\nError: %v\n", msg)
 		return m, tea.Quit
@@ -72,13 +72,13 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, m.saveNote(msg.Note, msg.F)
 	case utils.SaveNoteMsg:
 		m.curFocus = LOADING
-		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.noteService))
+		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
 	case utils.FailedToDeleteNoteMsg:
 		log.Fatalf("Failed to delete note!\nError: %v\n", msg)
 		return m, tea.Quit
 	case utils.DeletedNoteMsg:
 		m.curFocus = LOADING
-		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.noteService))
+		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
 	}
 
 	// Update all of the delegated models
@@ -161,5 +161,5 @@ func (m *Main) saveNote(note model.Note, f *os.File) tea.Cmd {
 	note.Content = strings.Join(lines[2:], "\n")
 	note.LastEditedDate = time.Now()
 
-	return utils.SaveNoteCmd(m.noteService, note)
+	return utils.SaveNoteCmd(m.gqlClient, note)
 }

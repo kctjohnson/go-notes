@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go-notes/cmd/gonotes/utils"
 	"go-notes/internal/db/model"
-	"go-notes/internal/services"
+	"go-notes/internal/graphql"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -24,10 +24,10 @@ type List struct {
 	scrollIndex  int
 	maxViewNotes int
 
-	noteService *services.NotesService
+	gqlClient *graphql.Client
 }
 
-func NewList(keys listKeymap, ns *services.NotesService) *List {
+func NewList(keys listKeymap, gqlClient *graphql.Client) *List {
 	// Disable the built in viewport keybindings
 	preview := viewport.New(40, 15)
 	preview.KeyMap.Down.SetEnabled(false)
@@ -46,7 +46,7 @@ func NewList(keys listKeymap, ns *services.NotesService) *List {
 		cursor:       0,
 		scrollIndex:  0,
 		maxViewNotes: 15,
-		noteService:  ns,
+		gqlClient:    gqlClient,
 	}
 }
 
@@ -76,11 +76,11 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.keys.ViewDown):
 			m.preview.LineDown(1)
 		case key.Matches(msg, m.keys.New):
-			return m, utils.CreateNoteCmd(m.noteService, "New Note Title")
+			return m, utils.CreateNoteCmd(m.gqlClient, "New Note Title")
 		case key.Matches(msg, m.keys.Delete):
-			return m, utils.DeleteNoteCmd(m.noteService, m.notes[m.cursor].ID)
+			return m, utils.DeleteNoteCmd(m.gqlClient, m.notes[m.cursor].ID)
 		case key.Matches(msg, m.keys.Select):
-			return m, utils.EditNoteCmd(m.noteService, m.notes[m.cursor].ID)
+			return m, utils.EditNoteCmd(m.gqlClient, m.notes[m.cursor].ID)
 		case key.Matches(msg, m.keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
 			m.preview.Width = m.width - lipgloss.Width(m.View()) - 2

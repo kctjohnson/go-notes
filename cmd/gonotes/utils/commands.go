@@ -2,7 +2,7 @@ package utils
 
 import (
 	"go-notes/internal/db/model"
-	"go-notes/internal/services"
+	"go-notes/internal/graphql"
 	"os"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -11,9 +11,9 @@ import (
 type FailedToLoadNotesMsg error
 type LoadedNotesMsg []model.Note
 
-func LoadNotesCmd(ns *services.NotesService) tea.Cmd {
+func LoadNotesCmd(gqlClient *graphql.Client) tea.Cmd {
 	return func() tea.Msg {
-		notes, err := ns.GetNotes()
+		notes, err := gqlClient.GetNotes()
 		if err != nil {
 			return FailedToLoadNotesMsg(err)
 		} else {
@@ -25,9 +25,9 @@ func LoadNotesCmd(ns *services.NotesService) tea.Cmd {
 type FailedToCreateNoteMsg error
 type CreatedNoteMsg model.Note
 
-func CreateNoteCmd(ns *services.NotesService, title string) tea.Cmd {
+func CreateNoteCmd(gqlClient *graphql.Client, title string) tea.Cmd {
 	return func() tea.Msg {
-		note, err := ns.CreateNote("This is the title!")
+		note, err := gqlClient.CreateNote("This is the title!")
 		if err != nil {
 			return FailedToCreateNoteMsg(err)
 		}
@@ -43,9 +43,9 @@ type SaveEditsMsg struct {
 	Err  error
 }
 
-func EditNoteCmd(ns *services.NotesService, id int64) tea.Cmd {
+func EditNoteCmd(gqlClient *graphql.Client, id int64) tea.Cmd {
 	return func() tea.Msg {
-		note, err := ns.GetNote(id)
+		note, err := gqlClient.GetNote(id)
 		if err != nil {
 			return FailedToEditNoteMsg(err)
 		}
@@ -56,9 +56,9 @@ func EditNoteCmd(ns *services.NotesService, id int64) tea.Cmd {
 type FailedToSaveNoteMsg error
 type SaveNoteMsg model.Note
 
-func SaveNoteCmd(ns *services.NotesService, note model.Note) tea.Cmd {
+func SaveNoteCmd(gqlClient *graphql.Client, note model.Note) tea.Cmd {
 	return func() tea.Msg {
-		updatedNote, err := ns.SaveNote(note)
+		updatedNote, err := gqlClient.SaveNote(note)
 		if err != nil {
 			return FailedToSaveNoteMsg(err)
 		}
@@ -69,9 +69,9 @@ func SaveNoteCmd(ns *services.NotesService, note model.Note) tea.Cmd {
 type FailedToDeleteNoteMsg error
 type DeletedNoteMsg int64
 
-func DeleteNoteCmd(ns *services.NotesService, id int64) tea.Cmd {
+func DeleteNoteCmd(gqlClient *graphql.Client, id int64) tea.Cmd {
 	return func() tea.Msg {
-		err := ns.DeleteNote(id)
+		err := gqlClient.DeleteNote(id)
 		if err != nil {
 			return FailedToDeleteNoteMsg(err)
 		}

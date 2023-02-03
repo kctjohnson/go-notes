@@ -1,9 +1,8 @@
 {
-  "db": {
-    "user": "",
-    "password": "",
-    "ip": "",
-    "port": "",
-    "database": "gonotes"
+  "gql_client": {
+    "endpoint": "http://localhost:3030/graphql"
+  },
+  "gql_server": {
+    "port": "3030"
   }
 }

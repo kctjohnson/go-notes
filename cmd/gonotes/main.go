@@ -14,6 +14,33 @@ import (
 	"github.com/spf13/viper"
 )
 
+func main() {
+	// Set up logging
+	f, err := tea.LogToFile("debug.log", "debug")
+	if err != nil {
+		fmt.Println("fatal: ", err)
+		os.Exit(1)
+	}
+	defer f.Close()
+
+	// Set up env vars
+	initConfig()
+	endpoint := viper.GetString("gql_client.endpoint")
+
+	log.Println(endpoint)
+
+	// Create the graphql connection client
+	client := graphql.NewClient(endpoint, http.DefaultClient)
+
+	// Start the charm CLI UI
+	mainModel := models.NewMain(client)
+	program := tea.NewProgram(mainModel)
+	if _, err := program.Run(); err != nil {
+		fmt.Printf("Failed to run program: %v", err)
+		os.Exit(1)
+	}
+}
+
 func initConfig() {
 	// Set up the config
 	viper.SetConfigName("config")
@@ -47,34 +74,5 @@ func initConfig() {
 		if err != nil {
 			panic(err)
 		}
-	}
-}
-
-func main() {
-	// Set up logging
-	f, err := tea.LogToFile("debug.log", "debug")
-	if err != nil {
-		fmt.Println("fatal: ", err)
-		os.Exit(1)
-	}
-	defer f.Close()
-
-	// Set up env vars
-	initConfig()
-
-	// dbUser := viper.GetString("db.user")
-	// dbPassword := viper.GetString("db.password")
-	// dbIP := viper.GetString("db.ip")
-	// dbPort := viper.GetString("db.port")
-
-	// Create the graphql connection client
-	client := graphql.NewClient("http://localhost:3030/graphql", http.DefaultClient)
-
-	// Start the charm CLI UI
-	mainModel := models.NewMain(client)
-	program := tea.NewProgram(mainModel)
-	if _, err := program.Run(); err != nil {
-		fmt.Printf("Failed to run program: %v", err)
-		os.Exit(1)
 	}
 }

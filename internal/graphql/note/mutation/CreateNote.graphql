@@ -1,0 +1,9 @@
+mutation CreateNote($title: string!) {
+  createNote(title: $title) {
+    content
+    created_date
+    id
+    last_edited_date
+    title
+  }
+}

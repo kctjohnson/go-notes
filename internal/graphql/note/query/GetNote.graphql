@@ -1,0 +1,9 @@
+query GetNote($noteId: int64!) {
+  note(id: $noteId) {
+    id
+    title
+    content
+    created_date
+    last_edited_date
+  }
+}

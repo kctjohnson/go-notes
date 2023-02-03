@@ -1,0 +1,14 @@
+schema: ./internal/graphql/schema.graphql
+operations:
+  - ./internal/graphql/note/**/*.graphql
+generated: ./internal/graphql/generated.go
+optional: pointer
+bindings:
+  int64:
+    type: int64
+  string:
+    type: string
+  Time:
+    type: time.Time
+  bool:
+    type: bool

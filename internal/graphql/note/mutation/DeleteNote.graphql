@@ -1,0 +1,3 @@
+mutation DeleteNote($iD: int64!) {
+  deleteNote(iD: $iD)
+}

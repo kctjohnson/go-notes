@@ -1,0 +1,9 @@
+mutation SaveNote($note: Note_InputObject!) {
+  saveNote(note: $note) {
+    content
+    created_date
+    id
+    last_edited_date
+    title
+  }
+}

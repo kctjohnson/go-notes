@@ -1,0 +1,9 @@
+query GetNotes {
+  notes {
+    id
+    title
+    content
+    created_date
+    last_edited_date
+  }
+}

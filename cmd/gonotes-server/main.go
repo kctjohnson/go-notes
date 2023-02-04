@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	gographql "go-notes/cmd/gonotes-server/graphql"
+	"go-notes/internal/config"
 	"go-notes/internal/db/repositories"
 	"go-notes/internal/services"
 	"net/http"
@@ -13,11 +15,11 @@ import (
 	"github.com/samsarahq/thunder/graphql/introspection"
 )
 
-type Application struct {
-	gqlServer *gographql.GQLServer
-}
-
 func main() {
+	// Init the config
+	conf := config.NewConfig()
+	conf.Init()
+
 	db, err := openDB()
 	if err != nil {
 		panic(err)
@@ -35,8 +37,9 @@ func main() {
 	schema := gql.Schema()
 	introspection.AddIntrospectionToSchema(schema)
 
+	fmt.Printf("Starting graphql server on port %s\n", conf.GqlServer.Port)
 	http.Handle("/graphql", corsHandler(graphql.HTTPHandler(schema)))
-	http.ListenAndServe(":3030", nil)
+	http.ListenAndServe(":"+conf.GqlServer.Port, nil)
 }
 
 func openDB() (*sqlx.DB, error) {

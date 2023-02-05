@@ -6,3 +6,7 @@ migrate-new:
 	migrate create -ext sql -dir migrations -seq 'new'
 gqlgen:
 	go run github.com/Khan/genqlient
+run-client:
+	go run ./cmd/gonotes/.
+run-server:
+	go run ./cmd/gonotes-server/.

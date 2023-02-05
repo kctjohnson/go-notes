@@ -1,7 +1,7 @@
 package graphql
 
 import (
-	"go-notes/cmd/gonotes-server/graphql/inputs"
+	"go-notes/cmd/gonotes-server/graphql/input"
 	"go-notes/internal/db/model"
 	"go-notes/internal/services"
 
@@ -21,21 +21,21 @@ func (g *NotesGql) registerQuery(querySchemaObj *schemabuilder.Object) {
 		return g.NotesService.GetNotes()
 	})
 
-	querySchemaObj.FieldFunc("note", func(args inputs.GetNotesInput) (model.Note, error) {
+	querySchemaObj.FieldFunc("note", func(args input.GetNotes) (model.Note, error) {
 		return g.NotesService.GetNote(args.NoteID)
 	})
 }
 
 func (g *NotesGql) registerMutation(mutationSchemaObj *schemabuilder.Object) {
-	mutationSchemaObj.FieldFunc("createNote", func(args struct{ Title string }) (model.Note, error) {
+	mutationSchemaObj.FieldFunc("createNote", func(args input.CreateNote) (model.Note, error) {
 		return g.NotesService.CreateNote(args.Title)
 	})
 
-	mutationSchemaObj.FieldFunc("saveNote", func(args struct{ Note model.Note }) (model.Note, error) {
+	mutationSchemaObj.FieldFunc("saveNote", func(args input.SaveNote) (model.Note, error) {
 		return g.NotesService.SaveNote(args.Note)
 	})
 
-	mutationSchemaObj.FieldFunc("deleteNote", func(args struct{ ID int64 }) error {
+	mutationSchemaObj.FieldFunc("deleteNote", func(args input.DeleteNote) error {
 		return g.NotesService.DeleteNote(args.ID)
 	})
 }

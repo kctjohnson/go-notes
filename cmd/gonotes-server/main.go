@@ -26,11 +26,17 @@ func main() {
 	}
 	defer db.Close()
 
+	tr := repositories.NewTagsRepository(db)
+	ts := services.NewTagsService(tr)
+
 	nr := repositories.NewNotesRepository(db)
 	ns := services.NewNotesService(nr)
 	gql := gographql.GQLServer{
 		NotesGql: &gographql.NotesGql{
 			NotesService: ns,
+		},
+		TagsGql: &gographql.TagsGql{
+			TagsService: ts,
 		},
 	}
 

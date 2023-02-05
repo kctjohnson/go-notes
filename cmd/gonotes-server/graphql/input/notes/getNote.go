@@ -1,5 +1,5 @@
 package input
 
-type GetNotes struct {
+type GetNote struct {
 	NoteID int64 `graphql:"id"`
 }

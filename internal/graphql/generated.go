@@ -35,7 +35,7 @@ func (v *CreateNoteCreateNote) GetTitle() string { return v.Title }
 
 // CreateNoteResponse is returned by CreateNote on success.
 type CreateNoteResponse struct {
-	CreateNote CreateNoteCreateNote `json:"createNote"`
+	CreateNote CreateNoteCreateNote `json:"CreateNote"`
 }
 
 // GetCreateNote returns CreateNoteResponse.CreateNote, and is useful for accessing the field via an interface.
@@ -43,7 +43,7 @@ func (v *CreateNoteResponse) GetCreateNote() CreateNoteCreateNote { return v.Cre
 
 // DeleteNoteResponse is returned by DeleteNote on success.
 type DeleteNoteResponse struct {
-	DeleteNote bool `json:"deleteNote"`
+	DeleteNote bool `json:"DeleteNote"`
 }
 
 // GetDeleteNote returns DeleteNoteResponse.DeleteNote, and is useful for accessing the field via an interface.
@@ -75,7 +75,7 @@ func (v *GetNoteNote) GetLast_edited_date() time.Time { return v.Last_edited_dat
 
 // GetNoteResponse is returned by GetNote on success.
 type GetNoteResponse struct {
-	Note GetNoteNote `json:"note"`
+	Note GetNoteNote `json:"Note"`
 }
 
 // GetNote returns GetNoteResponse.Note, and is useful for accessing the field via an interface.
@@ -107,7 +107,7 @@ func (v *GetNotesNotesNote) GetLast_edited_date() time.Time { return v.Last_edit
 
 // GetNotesResponse is returned by GetNotes on success.
 type GetNotesResponse struct {
-	Notes []GetNotesNotesNote `json:"notes"`
+	Notes []GetNotesNotesNote `json:"Notes"`
 }
 
 // GetNotes returns GetNotesResponse.Notes, and is useful for accessing the field via an interface.
@@ -118,6 +118,7 @@ type Note_InputObject struct {
 	Created_date     time.Time `json:"created_date"`
 	Id               int64     `json:"id"`
 	Last_edited_date time.Time `json:"last_edited_date"`
+	Tag_id           int64     `json:"tag_id"`
 	Title            string    `json:"title"`
 }
 
@@ -133,12 +134,15 @@ func (v *Note_InputObject) GetId() int64 { return v.Id }
 // GetLast_edited_date returns Note_InputObject.Last_edited_date, and is useful for accessing the field via an interface.
 func (v *Note_InputObject) GetLast_edited_date() time.Time { return v.Last_edited_date }
 
+// GetTag_id returns Note_InputObject.Tag_id, and is useful for accessing the field via an interface.
+func (v *Note_InputObject) GetTag_id() int64 { return v.Tag_id }
+
 // GetTitle returns Note_InputObject.Title, and is useful for accessing the field via an interface.
 func (v *Note_InputObject) GetTitle() string { return v.Title }
 
 // SaveNoteResponse is returned by SaveNote on success.
 type SaveNoteResponse struct {
-	SaveNote SaveNoteSaveNote `json:"saveNote"`
+	SaveNote SaveNoteSaveNote `json:"SaveNote"`
 }
 
 // GetSaveNote returns SaveNoteResponse.SaveNote, and is useful for accessing the field via an interface.
@@ -178,11 +182,11 @@ func (v *__CreateNoteInput) GetTitle() string { return v.Title }
 
 // __DeleteNoteInput is used internally by genqlient
 type __DeleteNoteInput struct {
-	ID int64 `json:"iD"`
+	Id int64 `json:"id"`
 }
 
-// GetID returns __DeleteNoteInput.ID, and is useful for accessing the field via an interface.
-func (v *__DeleteNoteInput) GetID() int64 { return v.ID }
+// GetId returns __DeleteNoteInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteNoteInput) GetId() int64 { return v.Id }
 
 // __GetNoteInput is used internally by genqlient
 type __GetNoteInput struct {
@@ -209,7 +213,7 @@ func CreateNote(
 		OpName: "CreateNote",
 		Query: `
 mutation CreateNote ($title: string!) {
-	createNote(title: $title) {
+	CreateNote(title: $title) {
 		content
 		created_date
 		id
@@ -239,17 +243,17 @@ mutation CreateNote ($title: string!) {
 func DeleteNote(
 	ctx context.Context,
 	client graphql.Client,
-	iD int64,
+	id int64,
 ) (*DeleteNoteResponse, error) {
 	req := &graphql.Request{
 		OpName: "DeleteNote",
 		Query: `
-mutation DeleteNote ($iD: int64!) {
-	deleteNote(iD: $iD)
+mutation DeleteNote ($id: int64!) {
+	DeleteNote(id: $id)
 }
 `,
 		Variables: &__DeleteNoteInput{
-			ID: iD,
+			Id: id,
 		},
 	}
 	var err error
@@ -275,7 +279,7 @@ func GetNote(
 		OpName: "GetNote",
 		Query: `
 query GetNote ($noteId: int64!) {
-	note(id: $noteId) {
+	Note(id: $noteId) {
 		id
 		title
 		content
@@ -310,7 +314,7 @@ func GetNotes(
 		OpName: "GetNotes",
 		Query: `
 query GetNotes {
-	notes {
+	Notes {
 		id
 		title
 		content
@@ -343,7 +347,7 @@ func SaveNote(
 		OpName: "SaveNote",
 		Query: `
 mutation SaveNote ($note: Note_InputObject!) {
-	saveNote(note: $note) {
+	SaveNote(note: $note) {
 		content
 		created_date
 		id

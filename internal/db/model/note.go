@@ -8,5 +8,5 @@ type Note struct {
 	Content        string    `db:"content" graphql:"content"`
 	CreatedDate    time.Time `db:"created_date" graphql:"created_date"`
 	LastEditedDate time.Time `db:"last_edited_date" graphql:"last_edited_date"`
-	TagID          int64     `db:"tag_id" graphql:"tag_id"`
+	TagID          *int64    `db:"tag_id" graphql:"tag_id"`
 }

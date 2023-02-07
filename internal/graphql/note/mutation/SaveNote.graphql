@@ -1,5 +1,5 @@
 mutation SaveNote($note: Note_InputObject!) {
-  saveNote(note: $note) {
+  SaveNote(note: $note) {
     content
     created_date
     id

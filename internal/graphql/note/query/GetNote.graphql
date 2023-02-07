@@ -1,5 +1,5 @@
 query GetNote($noteId: int64!) {
-  note(id: $noteId) {
+  Note(id: $noteId) {
     id
     title
     content

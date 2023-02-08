@@ -1,4 +1,4 @@
-package models
+package list
 
 import "github.com/charmbracelet/bubbles/key"
 
@@ -26,7 +26,7 @@ func (k listKeymap) FullHelp() [][]key.Binding {
 	}
 }
 
-var listKeys = listKeymap{
+var Keys = listKeymap{
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
 		key.WithHelp("↑/k", "Up"),

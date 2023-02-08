@@ -1,4 +1,4 @@
-package models
+package list
 
 import (
 	"fmt"
@@ -14,9 +14,8 @@ import (
 )
 
 type List struct {
-	notes   []model.Note
+	Notes   []model.Note
 	preview viewport.Model
-	keys    listKeymap
 	help    help.Model
 
 	width        int
@@ -27,7 +26,7 @@ type List struct {
 	gqlClient *graphql.Client
 }
 
-func NewList(keys listKeymap, gqlClient *graphql.Client) *List {
+func New(gqlClient *graphql.Client) *List {
 	// Disable the built in viewport keybindings
 	preview := viewport.New(40, 15)
 	preview.KeyMap.Down.SetEnabled(false)
@@ -38,8 +37,7 @@ func NewList(keys listKeymap, gqlClient *graphql.Client) *List {
 	preview.KeyMap.HalfPageUp.SetEnabled(false)
 
 	return &List{
-		notes:        []model.Note{},
-		keys:         keys,
+		Notes:        []model.Note{},
 		preview:      preview,
 		help:         help.New(),
 		width:        0,
@@ -65,35 +63,35 @@ func (m List) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.preview.Width = msg.Width - lipgloss.Width(m.View()) - 2
 	case tea.KeyMsg:
 		switch {
-		case key.Matches(msg, m.keys.Up):
+		case key.Matches(msg, Keys.Up):
 			m.cursorUp()
 			m.preview.GotoTop()
-		case key.Matches(msg, m.keys.Down):
+		case key.Matches(msg, Keys.Down):
 			m.cursorDown()
 			m.preview.GotoTop()
-		case key.Matches(msg, m.keys.ViewUp):
+		case key.Matches(msg, Keys.ViewUp):
 			m.preview.LineUp(1)
-		case key.Matches(msg, m.keys.ViewDown):
+		case key.Matches(msg, Keys.ViewDown):
 			m.preview.LineDown(1)
-		case key.Matches(msg, m.keys.New):
+		case key.Matches(msg, Keys.New):
 			return m, utils.CreateNoteCmd(m.gqlClient, "New Note Title")
-		case key.Matches(msg, m.keys.Delete):
-			return m, utils.DeleteNoteCmd(m.gqlClient, m.notes[m.cursor].ID)
-		case key.Matches(msg, m.keys.Select):
-			return m, utils.EditNoteCmd(m.gqlClient, m.notes[m.cursor].ID)
-		case key.Matches(msg, m.keys.Help):
+		case key.Matches(msg, Keys.Delete):
+			return m, utils.DeleteNoteCmd(m.gqlClient, m.Notes[m.cursor].ID)
+		case key.Matches(msg, Keys.Select):
+			return m, utils.EditNoteCmd(m.gqlClient, m.Notes[m.cursor].ID)
+		case key.Matches(msg, Keys.Help):
 			m.help.ShowAll = !m.help.ShowAll
 			m.preview.Width = m.width - lipgloss.Width(m.View()) - 2
-		case key.Matches(msg, m.keys.Quit):
+		case key.Matches(msg, Keys.Quit):
 			return m, tea.Quit
 		}
 	}
 
 	// Update the height of the preview
-	if len(m.notes) > 0 {
+	if len(m.Notes) > 0 {
 		contentHeight := lipgloss.Height(m.listView())
 		m.preview.Height = contentHeight
-		m.preview.SetContent(m.notes[m.cursor].Content)
+		m.preview.SetContent(m.Notes[m.cursor].Content)
 	}
 	previewModel, cmd := m.preview.Update(msg)
 	m.preview = previewModel
@@ -107,14 +105,14 @@ func (m List) View() string {
 
 func (m List) listView() string {
 	str := utils.TitleStyle.Render("Notes:") + "\n"
-	for row := m.scrollIndex; row < len(m.notes) && row < m.scrollIndex+m.maxViewNotes; row++ {
+	for row := m.scrollIndex; row < len(m.Notes) && row < m.scrollIndex+m.maxViewNotes; row++ {
 		if row == m.cursor {
-			str += fmt.Sprintf("%s\n", utils.FocusedLineStyle.Render(m.notes[row].Title))
+			str += fmt.Sprintf("%s\n", utils.FocusedLineStyle.Render(m.Notes[row].Title))
 		} else {
-			str += fmt.Sprintf("%s\n", m.notes[row].Title)
+			str += fmt.Sprintf("%s\n", m.Notes[row].Title)
 		}
 	}
-	str += "\n" + m.help.View(listKeys)
+	str += "\n" + m.help.View(Keys)
 	return str
 }
 
@@ -134,7 +132,7 @@ func (m *List) cursorUp() {
 }
 
 func (m *List) cursorDown() {
-	if m.cursor == len(m.notes)-1 {
+	if m.cursor == len(m.Notes)-1 {
 		return
 	} else if m.cursor == m.scrollIndex+m.maxViewNotes-1 {
 		m.cursor++
@@ -149,7 +147,7 @@ func (m *List) constrainCursor() {
 		m.cursor = 0
 	}
 
-	if m.cursor >= len(m.notes) {
-		m.cursor = len(m.notes) - 1
+	if m.cursor >= len(m.Notes) {
+		m.cursor = len(m.Notes) - 1
 	}
 }

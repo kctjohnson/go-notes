@@ -1,4 +1,4 @@
-package models
+package tags
 
 import (
 	"github.com/charmbracelet/bubbles/key"
@@ -26,7 +26,7 @@ func (k tagsKeymap) FullHelp() [][]key.Binding {
 	}
 }
 
-var tagsKeys = tagsKeymap{
+var Keys = tagsKeymap{
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
 		key.WithHelp("↑/k", "Up"),

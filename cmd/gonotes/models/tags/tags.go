@@ -1,10 +1,11 @@
-package models
+package tags
 
 import (
 	"fmt"
 	"go-notes/cmd/gonotes/utils"
 	"go-notes/internal/db/model"
 	"go-notes/internal/graphql"
+	"strings"
 
 	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/key"
@@ -15,17 +16,16 @@ import (
 type TagsState int
 
 const (
-	TAG_LIST TagsState = iota
-	TAG_NEW
+	LIST TagsState = iota
+	NEW
 )
 
 type Tags struct {
-	tags   []model.Tag
+	Tags   []model.Tag
 	width  int
 	height int
-	keys   tagsKeymap
 	help   help.Model
-	state  TagsState
+	State  TagsState
 
 	activeFilterTag int
 	cursor          int
@@ -37,7 +37,7 @@ type Tags struct {
 	gqlClient *graphql.Client
 }
 
-func NewTags(keys tagsKeymap, gqlClient *graphql.Client) *Tags {
+func New(gqlClient *graphql.Client) *Tags {
 	maxHeight := 15
 	width := 20
 
@@ -47,12 +47,11 @@ func NewTags(keys tagsKeymap, gqlClient *graphql.Client) *Tags {
 	textInput.Width = width
 
 	return &Tags{
-		tags:            []model.Tag{{ID: -1, Name: "All"}},
+		Tags:            []model.Tag{{ID: -1, Name: "All"}},
 		width:           width,
 		height:          maxHeight,
-		keys:            keys,
 		help:            help.New(),
-		state:           TAG_LIST,
+		State:           LIST,
 		activeFilterTag: 0,
 		cursor:          0,
 		scrollIndex:     0,
@@ -70,52 +69,85 @@ func (m Tags) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Constrain the cursor to prevent it from going out of bounds
 	m.constrainCursor()
 
+	var cmd tea.Cmd
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
 		m.width = msg.Width
 		m.help.Width = msg.Width
 	case tea.KeyMsg:
-		if m.state == TAG_LIST {
+		if m.State == LIST {
 			switch {
-			case key.Matches(msg, m.keys.Up):
+			case key.Matches(msg, Keys.Up):
 				m.cursorUp()
-			case key.Matches(msg, m.keys.Down):
+			case key.Matches(msg, Keys.Down):
 				m.cursorDown()
-			case key.Matches(msg, m.keys.Toggle):
+			case key.Matches(msg, Keys.Toggle):
 				if m.cursor == m.activeFilterTag {
 					m.activeFilterTag = 0
 				} else {
 					m.activeFilterTag = m.cursor
 				}
-			case key.Matches(msg, m.keys.New):
-				m.state = TAG_NEW
-				return m, utils.CreateTagCmd(m.gqlClient, "New Tag")
-			case key.Matches(msg, m.keys.Delete):
+			case key.Matches(msg, Keys.New):
+				m.State = NEW
+				m.input.Reset()
+				m.input.Focus()
+				return m, nil
+			case key.Matches(msg, Keys.Delete):
 				if m.cursor != 0 {
-					toDelete := m.tags[m.cursor].ID
+					toDelete := m.Tags[m.cursor].ID
 					// Set the active filter back to all if they delete the active filter
 					if m.cursor == m.activeFilterTag {
 						m.activeFilterTag = 0
 					}
 					return m, utils.DeleteTagCmd(m.gqlClient, toDelete)
 				}
-			case key.Matches(msg, m.keys.Help):
+			case key.Matches(msg, Keys.Help):
 				m.help.ShowAll = !m.help.ShowAll
-			case key.Matches(msg, m.keys.Quit):
+			case key.Matches(msg, Keys.Quit):
 				return m, tea.Quit
 			}
-		} else if m.state == TAG_NEW {
+		} else if m.State == NEW {
 			switch {
+			case key.Matches(msg, InputKeys.Create):
+				m.input.Blur()
+				trimmedInput := strings.TrimSpace(m.input.Value())
+				m.State = LIST
+				return m, utils.CreateTagCmd(m.gqlClient, trimmedInput)
+			case key.Matches(msg, InputKeys.Back):
+				m.input.Blur()
+				m.input.Reset()
+				m.State = LIST
+			case key.Matches(msg, InputKeys.Quit):
+				m.input.Blur()
+				return m, tea.Quit
 			}
 		}
 	}
-	return m, nil
+
+	// Update the input if in state
+	if m.State == NEW {
+		var c tea.Cmd
+		m.input, c = m.input.Update(msg)
+		cmd = tea.Batch(cmd, c)
+	}
+
+	return m, cmd
 }
 
 func (m Tags) View() string {
+	switch m.State {
+	case LIST:
+		return m.viewList()
+	case NEW:
+		return m.viewInput()
+	}
+	return "Something went wrong! Press ctrl+c to exit!"
+}
+
+func (m Tags) viewList() string {
 	str := utils.TitleStyle.Render("Tags:") + "\n"
-	for row := m.scrollIndex; row < len(m.tags) && row < m.scrollIndex+m.maxViewTags; row++ {
-		line := m.tags[row].Name
+	for row := m.scrollIndex; row < len(m.Tags) && row < m.scrollIndex+m.maxViewTags; row++ {
+		line := m.Tags[row].Name
 		if row == m.activeFilterTag && row == m.cursor {
 			line = utils.FocusedLineStyle.Copy().Inherit(utils.UnderlinedStyle).Render(line)
 		} else if row == m.activeFilterTag {
@@ -130,7 +162,12 @@ func (m Tags) View() string {
 			str += fmt.Sprintf("%s\n", line)
 		}
 	}
-	str += "\n" + m.help.View(m.keys)
+	str += "\n" + m.help.View(Keys)
+	return str
+}
+
+func (m Tags) viewInput() string {
+	str := m.input.View()
 	return str
 }
 
@@ -146,7 +183,7 @@ func (m *Tags) cursorUp() {
 }
 
 func (m *Tags) cursorDown() {
-	if m.cursor == len(m.tags)-1 {
+	if m.cursor == len(m.Tags)-1 {
 		return
 	} else if m.cursor == m.scrollIndex+m.maxViewTags-1 {
 		m.cursor++
@@ -161,7 +198,7 @@ func (m *Tags) constrainCursor() {
 		m.cursor = 0
 	}
 
-	if m.cursor >= len(m.tags) {
-		m.cursor = len(m.tags) - 1
+	if m.cursor >= len(m.Tags) {
+		m.cursor = len(m.Tags) - 1
 	}
 }

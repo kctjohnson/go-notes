@@ -3,6 +3,8 @@ package models
 import (
 	"bufio"
 	"fmt"
+	"go-notes/cmd/gonotes/models/list"
+	"go-notes/cmd/gonotes/models/tags"
 	"go-notes/cmd/gonotes/utils"
 	"go-notes/internal/db/model"
 	"go-notes/internal/graphql"
@@ -26,8 +28,8 @@ const (
 
 type Main struct {
 	gqlClient *graphql.Client
-	list      List
-	tags      Tags
+	list      list.List
+	tags      tags.Tags
 	curState  StateEnum
 	prevState StateEnum
 }
@@ -35,8 +37,8 @@ type Main struct {
 func NewMain(gqlClient *graphql.Client) *Main {
 	return &Main{
 		gqlClient: gqlClient,
-		list:      *NewList(listKeys, gqlClient),
-		tags:      *NewTags(tagsKeys, gqlClient),
+		list:      *list.New(gqlClient),
+		tags:      *tags.New(gqlClient),
 		curState:  LOADING,
 	}
 }
@@ -52,22 +54,24 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.curState {
 		case LIST:
 			switch {
-			case key.Matches(msg, m.list.keys.Tags):
+			case key.Matches(msg, list.Keys.Tags):
 				m.curState = TAGS
 				return m, nil
 			}
 		case TAGS:
-			switch {
-			case key.Matches(msg, m.tags.keys.Back):
-				m.curState = LIST
-				return m, nil
+			if m.tags.State == tags.LIST {
+				switch {
+				case key.Matches(msg, tags.Keys.Back):
+					m.curState = LIST
+					return m, nil
+				}
 			}
 		}
 	case utils.FailedToLoadNotesMsg:
 		log.Fatalf("Failed to load notes!\nError: %v\n", msg)
 		return m, tea.Quit
 	case utils.LoadedNotesMsg:
-		m.list.notes = msg
+		m.list.Notes = msg
 		m.curState = LIST
 	case utils.FailedToCreateNoteMsg:
 		log.Fatalf("Failed to create note!\nError: %v\n", msg)
@@ -103,7 +107,7 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		log.Fatalf("Failed to load tags!\nError: %v\n", msg)
 		return m, tea.Quit
 	case utils.LoadedTagsMsg:
-		m.tags.tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
+		m.tags.Tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
 		m.curState = TAGS
 	case utils.FailedToCreateTagMsg:
 		log.Fatalf("Failed to create tag!\nError: %v\n", msg)
@@ -153,20 +157,20 @@ func (m Main) modelUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Delegate the window size messages
 	if _, ok := msg.(tea.WindowSizeMsg); ok {
 		listModel, listCmd := m.list.Update(msg)
-		m.list = listModel.(List)
+		m.list = listModel.(list.List)
 		tagsModel, tagsCmd := m.tags.Update(msg)
-		m.tags = tagsModel.(Tags)
+		m.tags = tagsModel.(tags.Tags)
 		return m, tea.Batch(listCmd, tagsCmd)
 	}
 
 	switch m.curState {
 	case LIST:
 		listModel, cmd := m.list.Update(msg)
-		m.list = listModel.(List)
+		m.list = listModel.(list.List)
 		return m, cmd
 	case TAGS:
 		tagsModel, cmd := m.tags.Update(msg)
-		m.tags = tagsModel.(Tags)
+		m.tags = tagsModel.(tags.Tags)
 		return m, cmd
 	}
 	return m, nil

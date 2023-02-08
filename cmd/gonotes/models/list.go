@@ -15,8 +15,8 @@ import (
 
 type List struct {
 	notes   []model.Note
-	keys    listKeymap
 	preview viewport.Model
+	keys    listKeymap
 	help    help.Model
 
 	width        int
@@ -109,7 +109,7 @@ func (m List) listView() string {
 	str := utils.TitleStyle.Render("Notes:") + "\n"
 	for row := m.scrollIndex; row < len(m.notes) && row < m.scrollIndex+m.maxViewNotes; row++ {
 		if row == m.cursor {
-			str += fmt.Sprintf("%s\n", utils.FocusedNoteStyle.Render(m.notes[row].Title))
+			str += fmt.Sprintf("%s\n", utils.FocusedLineStyle.Render(m.notes[row].Title))
 		} else {
 			str += fmt.Sprintf("%s\n", m.notes[row].Title)
 		}

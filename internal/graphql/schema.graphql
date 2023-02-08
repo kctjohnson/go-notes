@@ -31,7 +31,7 @@ type Note {
   last_edited_date: Time! @deprecated(reason: "")
 
   """"""
-  tag_id: int64! @deprecated(reason: "")
+  tag_id: int64 @deprecated(reason: "")
 
   """"""
   title: string! @deprecated(reason: "")
@@ -52,7 +52,7 @@ input Note_InputObject {
   last_edited_date: Time!
 
   """"""
-  tag_id: int64!
+  tag_id: int64
 
   """"""
   title: string!

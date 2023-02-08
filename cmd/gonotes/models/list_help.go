@@ -10,6 +10,7 @@ type listKeymap struct {
 	Select   key.Binding
 	New      key.Binding
 	Delete   key.Binding
+	Tags     key.Binding
 	Help     key.Binding
 	Quit     key.Binding
 }
@@ -20,7 +21,7 @@ func (k listKeymap) ShortHelp() []key.Binding {
 
 func (k listKeymap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
-		{k.Up, k.New, k.ViewUp, k.Select},
+		{k.Up, k.New, k.ViewUp, k.Select, k.Tags},
 		{k.Down, k.Delete, k.ViewDown, k.Help, k.Quit},
 	}
 }
@@ -28,19 +29,19 @@ func (k listKeymap) FullHelp() [][]key.Binding {
 var listKeys = listKeymap{
 	Up: key.NewBinding(
 		key.WithKeys("up", "k"),
-		key.WithHelp("↑/k", "move up"),
+		key.WithHelp("↑/k", "Up"),
 	),
 	Down: key.NewBinding(
 		key.WithKeys("down", "j"),
-		key.WithHelp("↓/j", "move down"),
+		key.WithHelp("↓/j", "Down"),
 	),
 	ViewUp: key.NewBinding(
 		key.WithKeys("shift+up", "K"),
-		key.WithHelp("⇧+↑/K", "preview up"),
+		key.WithHelp("⇧+↑/K", "Preview Up"),
 	),
 	ViewDown: key.NewBinding(
 		key.WithKeys("shift+down", "J"),
-		key.WithHelp("⇧+↓/J", "preview down"),
+		key.WithHelp("⇧+↓/J", "Preview Down"),
 	),
 	Select: key.NewBinding(
 		key.WithKeys("enter"),
@@ -54,12 +55,16 @@ var listKeys = listKeymap{
 		key.WithKeys("D"),
 		key.WithHelp("D", "Delete"),
 	),
+	Tags: key.NewBinding(
+		key.WithKeys("t"),
+		key.WithHelp("t", "Tags"),
+	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),
-		key.WithHelp("?", "toggle help"),
+		key.WithHelp("?", "Help"),
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("q", "esc", "ctrl+c"),
-		key.WithHelp("esc", "quit"),
+		key.WithHelp("esc", "Quit"),
 	),
 }

@@ -17,6 +17,67 @@ func NewClient(endpoint string, httpclient graphql.Doer) *Client {
 	}
 }
 
+func (c *Client) GetTags() ([]model.Tag, error) {
+	ctx := context.Background()
+	resp, err := GetTags(ctx, c.client)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert it to a model note slice
+	tags := []model.Tag{}
+	for _, n := range resp.Tags {
+		tag := model.Tag{
+			ID:   n.Id,
+			Name: n.Name,
+		}
+		tags = append(tags, tag)
+	}
+
+	return tags, nil
+}
+
+func (c *Client) GetTag(id int64) (model.Tag, error) {
+	ctx := context.Background()
+	resp, err := GetTag(ctx, c.client, id)
+	if err != nil {
+		return model.Tag{}, err
+	}
+
+	// Convert it to a model tag
+	tag := model.Tag{
+		ID:   resp.Tag.Id,
+		Name: resp.Tag.Name,
+	}
+
+	return tag, nil
+}
+
+func (c *Client) CreateTag(name string) (model.Tag, error) {
+	ctx := context.Background()
+	resp, err := CreateTag(ctx, c.client, name)
+	if err != nil {
+		return model.Tag{}, err
+	}
+
+	// Convert it to a model note
+	note := model.Tag{
+		ID:   resp.CreateTag.Id,
+		Name: resp.CreateTag.Name,
+	}
+
+	return note, nil
+}
+
+func (c *Client) DeleteTag(id int64) error {
+	ctx := context.Background()
+	_, err := DeleteTag(ctx, c.client, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Client) GetNotes() ([]model.Note, error) {
 	ctx := context.Background()
 	resp, err := GetNotes(ctx, c.client)

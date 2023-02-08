@@ -8,8 +8,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type FailedToLoadNotesMsg error
-type LoadedNotesMsg []model.Note
+type (
+	FailedToLoadNotesMsg error
+	LoadedNotesMsg       []model.Note
+)
 
 func LoadNotesCmd(gqlClient *graphql.Client) tea.Cmd {
 	return func() tea.Msg {
@@ -22,8 +24,10 @@ func LoadNotesCmd(gqlClient *graphql.Client) tea.Cmd {
 	}
 }
 
-type FailedToCreateNoteMsg error
-type CreatedNoteMsg model.Note
+type (
+	FailedToCreateNoteMsg error
+	CreatedNoteMsg        model.Note
+)
 
 func CreateNoteCmd(gqlClient *graphql.Client, title string) tea.Cmd {
 	return func() tea.Msg {
@@ -35,13 +39,15 @@ func CreateNoteCmd(gqlClient *graphql.Client, title string) tea.Cmd {
 	}
 }
 
-type FailedToEditNoteMsg error
-type EditNoteMsg model.Note
-type SaveEditsMsg struct {
-	Note model.Note
-	F    *os.File
-	Err  error
-}
+type (
+	FailedToEditNoteMsg error
+	EditNoteMsg         model.Note
+	SaveEditsMsg        struct {
+		Note model.Note
+		F    *os.File
+		Err  error
+	}
+)
 
 func EditNoteCmd(gqlClient *graphql.Client, id int64) tea.Cmd {
 	return func() tea.Msg {
@@ -53,8 +59,10 @@ func EditNoteCmd(gqlClient *graphql.Client, id int64) tea.Cmd {
 	}
 }
 
-type FailedToSaveNoteMsg error
-type SaveNoteMsg model.Note
+type (
+	FailedToSaveNoteMsg error
+	SaveNoteMsg         model.Note
+)
 
 func SaveNoteCmd(gqlClient *graphql.Client, note model.Note) tea.Cmd {
 	return func() tea.Msg {
@@ -66,8 +74,10 @@ func SaveNoteCmd(gqlClient *graphql.Client, note model.Note) tea.Cmd {
 	}
 }
 
-type FailedToDeleteNoteMsg error
-type DeletedNoteMsg int64
+type (
+	FailedToDeleteNoteMsg error
+	DeletedNoteMsg        int64
+)
 
 func DeleteNoteCmd(gqlClient *graphql.Client, id int64) tea.Cmd {
 	return func() tea.Msg {
@@ -76,5 +86,53 @@ func DeleteNoteCmd(gqlClient *graphql.Client, id int64) tea.Cmd {
 			return FailedToDeleteNoteMsg(err)
 		}
 		return DeletedNoteMsg(id)
+	}
+}
+
+type (
+	FailedToLoadTagsMsg error
+	LoadedTagsMsg       []model.Tag
+)
+
+func LoadTagsCmd(gqlClient *graphql.Client) tea.Cmd {
+	return func() tea.Msg {
+		tags, err := gqlClient.GetTags()
+		if err != nil {
+			return FailedToLoadTagsMsg(err)
+		} else {
+			return LoadedTagsMsg(tags)
+		}
+	}
+}
+
+type (
+	FailedToCreateTagMsg error
+	CreatedTagMsg        model.Tag
+)
+
+func CreateTagCmd(gqlClient *graphql.Client, name string) tea.Cmd {
+	return func() tea.Msg {
+		tag, err := gqlClient.CreateTag(name)
+		if err != nil {
+			return FailedToCreateTagMsg(err)
+		} else {
+			return CreatedTagMsg(tag)
+		}
+	}
+}
+
+type (
+	FailedToDeleteTagMsg error
+	DeletedTagMsg        int64
+)
+
+func DeleteTagCmd(gqlClient *graphql.Client, id int64) tea.Cmd {
+	return func() tea.Msg {
+		err := gqlClient.DeleteTag(id)
+		if err != nil {
+			return FailedToDeleteTagMsg(err)
+		} else {
+			return DeletedTagMsg(id)
+		}
 	}
 }

@@ -41,6 +41,26 @@ type CreateNoteResponse struct {
 // GetCreateNote returns CreateNoteResponse.CreateNote, and is useful for accessing the field via an interface.
 func (v *CreateNoteResponse) GetCreateNote() CreateNoteCreateNote { return v.CreateNote }
 
+// CreateTagCreateTag includes the requested fields of the GraphQL type Tag.
+type CreateTagCreateTag struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+// GetId returns CreateTagCreateTag.Id, and is useful for accessing the field via an interface.
+func (v *CreateTagCreateTag) GetId() int64 { return v.Id }
+
+// GetName returns CreateTagCreateTag.Name, and is useful for accessing the field via an interface.
+func (v *CreateTagCreateTag) GetName() string { return v.Name }
+
+// CreateTagResponse is returned by CreateTag on success.
+type CreateTagResponse struct {
+	CreateTag CreateTagCreateTag `json:"CreateTag"`
+}
+
+// GetCreateTag returns CreateTagResponse.CreateTag, and is useful for accessing the field via an interface.
+func (v *CreateTagResponse) GetCreateTag() CreateTagCreateTag { return v.CreateTag }
+
 // DeleteNoteResponse is returned by DeleteNote on success.
 type DeleteNoteResponse struct {
 	DeleteNote bool `json:"DeleteNote"`
@@ -48,6 +68,14 @@ type DeleteNoteResponse struct {
 
 // GetDeleteNote returns DeleteNoteResponse.DeleteNote, and is useful for accessing the field via an interface.
 func (v *DeleteNoteResponse) GetDeleteNote() bool { return v.DeleteNote }
+
+// DeleteTagResponse is returned by DeleteTag on success.
+type DeleteTagResponse struct {
+	DeleteTag bool `json:"DeleteTag"`
+}
+
+// GetDeleteTag returns DeleteTagResponse.DeleteTag, and is useful for accessing the field via an interface.
+func (v *DeleteTagResponse) GetDeleteTag() bool { return v.DeleteTag }
 
 // GetNoteNote includes the requested fields of the GraphQL type Note.
 type GetNoteNote struct {
@@ -113,12 +141,52 @@ type GetNotesResponse struct {
 // GetNotes returns GetNotesResponse.Notes, and is useful for accessing the field via an interface.
 func (v *GetNotesResponse) GetNotes() []GetNotesNotesNote { return v.Notes }
 
+// GetTagResponse is returned by GetTag on success.
+type GetTagResponse struct {
+	Tag GetTagTag `json:"Tag"`
+}
+
+// GetTag returns GetTagResponse.Tag, and is useful for accessing the field via an interface.
+func (v *GetTagResponse) GetTag() GetTagTag { return v.Tag }
+
+// GetTagTag includes the requested fields of the GraphQL type Tag.
+type GetTagTag struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+// GetId returns GetTagTag.Id, and is useful for accessing the field via an interface.
+func (v *GetTagTag) GetId() int64 { return v.Id }
+
+// GetName returns GetTagTag.Name, and is useful for accessing the field via an interface.
+func (v *GetTagTag) GetName() string { return v.Name }
+
+// GetTagsResponse is returned by GetTags on success.
+type GetTagsResponse struct {
+	Tags []GetTagsTagsTag `json:"Tags"`
+}
+
+// GetTags returns GetTagsResponse.Tags, and is useful for accessing the field via an interface.
+func (v *GetTagsResponse) GetTags() []GetTagsTagsTag { return v.Tags }
+
+// GetTagsTagsTag includes the requested fields of the GraphQL type Tag.
+type GetTagsTagsTag struct {
+	Id   int64  `json:"id"`
+	Name string `json:"name"`
+}
+
+// GetId returns GetTagsTagsTag.Id, and is useful for accessing the field via an interface.
+func (v *GetTagsTagsTag) GetId() int64 { return v.Id }
+
+// GetName returns GetTagsTagsTag.Name, and is useful for accessing the field via an interface.
+func (v *GetTagsTagsTag) GetName() string { return v.Name }
+
 type Note_InputObject struct {
 	Content          string    `json:"content"`
 	Created_date     time.Time `json:"created_date"`
 	Id               int64     `json:"id"`
 	Last_edited_date time.Time `json:"last_edited_date"`
-	Tag_id           int64     `json:"tag_id"`
+	Tag_id           *int64    `json:"tag_id"`
 	Title            string    `json:"title"`
 }
 
@@ -135,7 +203,7 @@ func (v *Note_InputObject) GetId() int64 { return v.Id }
 func (v *Note_InputObject) GetLast_edited_date() time.Time { return v.Last_edited_date }
 
 // GetTag_id returns Note_InputObject.Tag_id, and is useful for accessing the field via an interface.
-func (v *Note_InputObject) GetTag_id() int64 { return v.Tag_id }
+func (v *Note_InputObject) GetTag_id() *int64 { return v.Tag_id }
 
 // GetTitle returns Note_InputObject.Title, and is useful for accessing the field via an interface.
 func (v *Note_InputObject) GetTitle() string { return v.Title }
@@ -180,6 +248,14 @@ type __CreateNoteInput struct {
 // GetTitle returns __CreateNoteInput.Title, and is useful for accessing the field via an interface.
 func (v *__CreateNoteInput) GetTitle() string { return v.Title }
 
+// __CreateTagInput is used internally by genqlient
+type __CreateTagInput struct {
+	Name string `json:"name"`
+}
+
+// GetName returns __CreateTagInput.Name, and is useful for accessing the field via an interface.
+func (v *__CreateTagInput) GetName() string { return v.Name }
+
 // __DeleteNoteInput is used internally by genqlient
 type __DeleteNoteInput struct {
 	Id int64 `json:"id"`
@@ -188,6 +264,14 @@ type __DeleteNoteInput struct {
 // GetId returns __DeleteNoteInput.Id, and is useful for accessing the field via an interface.
 func (v *__DeleteNoteInput) GetId() int64 { return v.Id }
 
+// __DeleteTagInput is used internally by genqlient
+type __DeleteTagInput struct {
+	Id int64 `json:"id"`
+}
+
+// GetId returns __DeleteTagInput.Id, and is useful for accessing the field via an interface.
+func (v *__DeleteTagInput) GetId() int64 { return v.Id }
+
 // __GetNoteInput is used internally by genqlient
 type __GetNoteInput struct {
 	NoteId int64 `json:"noteId"`
@@ -195,6 +279,14 @@ type __GetNoteInput struct {
 
 // GetNoteId returns __GetNoteInput.NoteId, and is useful for accessing the field via an interface.
 func (v *__GetNoteInput) GetNoteId() int64 { return v.NoteId }
+
+// __GetTagInput is used internally by genqlient
+type __GetTagInput struct {
+	TagId int64 `json:"tagId"`
+}
+
+// GetTagId returns __GetTagInput.TagId, and is useful for accessing the field via an interface.
+func (v *__GetTagInput) GetTagId() int64 { return v.TagId }
 
 // __SaveNoteInput is used internally by genqlient
 type __SaveNoteInput struct {
@@ -240,6 +332,39 @@ mutation CreateNote ($title: string!) {
 	return &data, err
 }
 
+func CreateTag(
+	ctx context.Context,
+	client graphql.Client,
+	name string,
+) (*CreateTagResponse, error) {
+	req := &graphql.Request{
+		OpName: "CreateTag",
+		Query: `
+mutation CreateTag ($name: string!) {
+	CreateTag(name: $name) {
+		id
+		name
+	}
+}
+`,
+		Variables: &__CreateTagInput{
+			Name: name,
+		},
+	}
+	var err error
+
+	var data CreateTagResponse
+	resp := &graphql.Response{Data: &data}
+
+	err = client.MakeRequest(
+		ctx,
+		req,
+		resp,
+	)
+
+	return &data, err
+}
+
 func DeleteNote(
 	ctx context.Context,
 	client graphql.Client,
@@ -259,6 +384,36 @@ mutation DeleteNote ($id: int64!) {
 	var err error
 
 	var data DeleteNoteResponse
+	resp := &graphql.Response{Data: &data}
+
+	err = client.MakeRequest(
+		ctx,
+		req,
+		resp,
+	)
+
+	return &data, err
+}
+
+func DeleteTag(
+	ctx context.Context,
+	client graphql.Client,
+	id int64,
+) (*DeleteTagResponse, error) {
+	req := &graphql.Request{
+		OpName: "DeleteTag",
+		Query: `
+mutation DeleteTag ($id: int64!) {
+	DeleteTag(id: $id)
+}
+`,
+		Variables: &__DeleteTagInput{
+			Id: id,
+		},
+	}
+	var err error
+
+	var data DeleteTagResponse
 	resp := &graphql.Response{Data: &data}
 
 	err = client.MakeRequest(
@@ -327,6 +482,68 @@ query GetNotes {
 	var err error
 
 	var data GetNotesResponse
+	resp := &graphql.Response{Data: &data}
+
+	err = client.MakeRequest(
+		ctx,
+		req,
+		resp,
+	)
+
+	return &data, err
+}
+
+func GetTag(
+	ctx context.Context,
+	client graphql.Client,
+	tagId int64,
+) (*GetTagResponse, error) {
+	req := &graphql.Request{
+		OpName: "GetTag",
+		Query: `
+query GetTag ($tagId: int64!) {
+	Tag(id: $tagId) {
+		id
+		name
+	}
+}
+`,
+		Variables: &__GetTagInput{
+			TagId: tagId,
+		},
+	}
+	var err error
+
+	var data GetTagResponse
+	resp := &graphql.Response{Data: &data}
+
+	err = client.MakeRequest(
+		ctx,
+		req,
+		resp,
+	)
+
+	return &data, err
+}
+
+func GetTags(
+	ctx context.Context,
+	client graphql.Client,
+) (*GetTagsResponse, error) {
+	req := &graphql.Request{
+		OpName: "GetTags",
+		Query: `
+query GetTags {
+	Tags {
+		id
+		name
+	}
+}
+`,
+	}
+	var err error
+
+	var data GetTagsResponse
 	resp := &graphql.Response{Data: &data}
 
 	err = client.MakeRequest(

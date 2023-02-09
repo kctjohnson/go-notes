@@ -1,7 +1,7 @@
 """"""
 type Mutation {
   """"""
-  CreateNote(title: string!): Note! @deprecated(reason: "")
+  CreateNote(tag_id: int64, title: string!): Note! @deprecated(reason: "")
 
   """"""
   CreateTag(name: string!): Tag! @deprecated(reason: "")
@@ -14,6 +14,9 @@ type Mutation {
 
   """"""
   SaveNote(note: Note_InputObject!): Note! @deprecated(reason: "")
+
+  """"""
+  SetNoteTag(note_id: int64!, tag_id: int64!): Note! @deprecated(reason: "")
 }
 
 """"""

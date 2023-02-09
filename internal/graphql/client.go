@@ -94,6 +94,7 @@ func (c *Client) GetNotes() ([]model.Note, error) {
 			Content:        n.Content,
 			CreatedDate:    n.Created_date,
 			LastEditedDate: n.Last_edited_date,
+			TagID:          n.Tag_id,
 		}
 		notes = append(notes, note)
 	}
@@ -115,14 +116,15 @@ func (c *Client) GetNote(id int64) (model.Note, error) {
 		Content:        resp.Note.Content,
 		CreatedDate:    resp.Note.Created_date,
 		LastEditedDate: resp.Note.Last_edited_date,
+		TagID:          resp.Note.Tag_id,
 	}
 
 	return note, nil
 }
 
-func (c *Client) CreateNote(title string) (model.Note, error) {
+func (c *Client) CreateNote(title string, tagID *int64) (model.Note, error) {
 	ctx := context.Background()
-	resp, err := CreateNote(ctx, c.client, title)
+	resp, err := CreateNote(ctx, c.client, title, tagID)
 	if err != nil {
 		return model.Note{}, err
 	}
@@ -134,6 +136,7 @@ func (c *Client) CreateNote(title string) (model.Note, error) {
 		Content:        resp.CreateNote.Content,
 		CreatedDate:    resp.CreateNote.Created_date,
 		LastEditedDate: resp.CreateNote.Last_edited_date,
+		TagID:          resp.CreateNote.Tag_id,
 	}
 
 	return note, nil
@@ -147,6 +150,7 @@ func (c *Client) SaveNote(note model.Note) (model.Note, error) {
 		Content:          note.Content,
 		Created_date:     note.CreatedDate,
 		Last_edited_date: note.LastEditedDate,
+		Tag_id:           note.TagID,
 	})
 	if err != nil {
 		return model.Note{}, err
@@ -159,6 +163,26 @@ func (c *Client) SaveNote(note model.Note) (model.Note, error) {
 		Content:        resp.SaveNote.Content,
 		CreatedDate:    resp.SaveNote.Created_date,
 		LastEditedDate: resp.SaveNote.Last_edited_date,
+		TagID:          resp.SaveNote.Tag_id,
+	}
+
+	return cnvNote, nil
+}
+
+func (c *Client) SetNoteTag(noteID, tagID int64) (model.Note, error) {
+	ctx := context.Background()
+	resp, err := SetNoteTag(ctx, c.client, noteID, tagID)
+	if err != nil {
+		return model.Note{}, err
+	}
+
+	cnvNote := model.Note{
+		ID:             resp.SetNoteTag.Id,
+		Title:          resp.SetNoteTag.Title,
+		Content:        resp.SetNoteTag.Content,
+		CreatedDate:    resp.SetNoteTag.Created_date,
+		LastEditedDate: resp.SetNoteTag.Last_edited_date,
+		TagID:          resp.SetNoteTag.Tag_id,
 	}
 
 	return cnvNote, nil

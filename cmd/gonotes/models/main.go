@@ -62,6 +62,11 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if m.tags.State == tags.LIST {
 				switch {
 				case key.Matches(msg, tags.Keys.Back):
+					if m.tags.ActiveFilterTag != 0 {
+						m.list.SetFilter(&m.tags.Tags[m.tags.ActiveFilterTag])
+					} else {
+						m.list.RemoveFilter()
+					}
 					m.curState = LIST
 					return m, nil
 				}
@@ -108,7 +113,20 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		return m, tea.Quit
 	case utils.LoadedTagsMsg:
 		m.tags.Tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
+		m.list.SetTag.Tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
 		m.curState = TAGS
+	case utils.FailedToLoadSetTagsMsg:
+		log.Fatalf("Failed to load tags!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.LoadedSetTagsMsg:
+		m.list.SetTag.Tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
+		m.curState = LIST
+	case utils.FailedToSetNoteTagMsg:
+		log.Fatalf("Failed to set tag on note!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.SetNoteTagMsg:
+		m.curState = LIST
+		return m, tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
 	case utils.FailedToCreateTagMsg:
 		log.Fatalf("Failed to create tag!\nError: %v\n", msg)
 		return m, tea.Quit
@@ -156,10 +174,10 @@ func (m *Main) setState(state StateEnum) {
 func (m Main) modelUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Delegate the window size messages
 	if _, ok := msg.(tea.WindowSizeMsg); ok {
-		listModel, listCmd := m.list.Update(msg)
-		m.list = listModel.(list.List)
 		tagsModel, tagsCmd := m.tags.Update(msg)
 		m.tags = tagsModel.(tags.Tags)
+		listModel, listCmd := m.list.Update(msg)
+		m.list = listModel.(list.List)
 		return m, tea.Batch(listCmd, tagsCmd)
 	}
 

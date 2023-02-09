@@ -26,11 +26,11 @@ var InputKeys = inputKeymap{
 		key.WithHelp("<enter>", "Create"),
 	),
 	Back: key.NewBinding(
-		key.WithKeys("esc"),
-		key.WithHelp("esc", "Back"),
+		key.WithKeys("esc", "q"),
+		key.WithHelp("q/esc", "Back"),
 	),
 	Quit: key.NewBinding(
 		key.WithKeys("ctrl+c"),
-		key.WithHelp("esc", "Quit"),
+		key.WithHelp("ctrl+c", "Quit"),
 	),
 }

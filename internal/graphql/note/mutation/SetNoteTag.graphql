@@ -1,0 +1,10 @@
+mutation SetNoteTag($noteId: int64!, $tagId: int64!) {
+  SetNoteTag(note_id: $noteId, tag_id: $tagId) {
+    id
+    title
+    content
+    created_date
+    last_edited_date
+    tag_id
+  }
+}

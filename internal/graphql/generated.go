@@ -11,12 +11,19 @@ import (
 
 // CreateNoteCreateNote includes the requested fields of the GraphQL type Note.
 type CreateNoteCreateNote struct {
+	Id               int64     `json:"id"`
+	Title            string    `json:"title"`
 	Content          string    `json:"content"`
 	Created_date     time.Time `json:"created_date"`
-	Id               int64     `json:"id"`
 	Last_edited_date time.Time `json:"last_edited_date"`
-	Title            string    `json:"title"`
+	Tag_id           *int64    `json:"tag_id"`
 }
+
+// GetId returns CreateNoteCreateNote.Id, and is useful for accessing the field via an interface.
+func (v *CreateNoteCreateNote) GetId() int64 { return v.Id }
+
+// GetTitle returns CreateNoteCreateNote.Title, and is useful for accessing the field via an interface.
+func (v *CreateNoteCreateNote) GetTitle() string { return v.Title }
 
 // GetContent returns CreateNoteCreateNote.Content, and is useful for accessing the field via an interface.
 func (v *CreateNoteCreateNote) GetContent() string { return v.Content }
@@ -24,14 +31,11 @@ func (v *CreateNoteCreateNote) GetContent() string { return v.Content }
 // GetCreated_date returns CreateNoteCreateNote.Created_date, and is useful for accessing the field via an interface.
 func (v *CreateNoteCreateNote) GetCreated_date() time.Time { return v.Created_date }
 
-// GetId returns CreateNoteCreateNote.Id, and is useful for accessing the field via an interface.
-func (v *CreateNoteCreateNote) GetId() int64 { return v.Id }
-
 // GetLast_edited_date returns CreateNoteCreateNote.Last_edited_date, and is useful for accessing the field via an interface.
 func (v *CreateNoteCreateNote) GetLast_edited_date() time.Time { return v.Last_edited_date }
 
-// GetTitle returns CreateNoteCreateNote.Title, and is useful for accessing the field via an interface.
-func (v *CreateNoteCreateNote) GetTitle() string { return v.Title }
+// GetTag_id returns CreateNoteCreateNote.Tag_id, and is useful for accessing the field via an interface.
+func (v *CreateNoteCreateNote) GetTag_id() *int64 { return v.Tag_id }
 
 // CreateNoteResponse is returned by CreateNote on success.
 type CreateNoteResponse struct {
@@ -84,6 +88,7 @@ type GetNoteNote struct {
 	Content          string    `json:"content"`
 	Created_date     time.Time `json:"created_date"`
 	Last_edited_date time.Time `json:"last_edited_date"`
+	Tag_id           *int64    `json:"tag_id"`
 }
 
 // GetId returns GetNoteNote.Id, and is useful for accessing the field via an interface.
@@ -101,6 +106,9 @@ func (v *GetNoteNote) GetCreated_date() time.Time { return v.Created_date }
 // GetLast_edited_date returns GetNoteNote.Last_edited_date, and is useful for accessing the field via an interface.
 func (v *GetNoteNote) GetLast_edited_date() time.Time { return v.Last_edited_date }
 
+// GetTag_id returns GetNoteNote.Tag_id, and is useful for accessing the field via an interface.
+func (v *GetNoteNote) GetTag_id() *int64 { return v.Tag_id }
+
 // GetNoteResponse is returned by GetNote on success.
 type GetNoteResponse struct {
 	Note GetNoteNote `json:"Note"`
@@ -116,6 +124,7 @@ type GetNotesNotesNote struct {
 	Content          string    `json:"content"`
 	Created_date     time.Time `json:"created_date"`
 	Last_edited_date time.Time `json:"last_edited_date"`
+	Tag_id           *int64    `json:"tag_id"`
 }
 
 // GetId returns GetNotesNotesNote.Id, and is useful for accessing the field via an interface.
@@ -132,6 +141,9 @@ func (v *GetNotesNotesNote) GetCreated_date() time.Time { return v.Created_date 
 
 // GetLast_edited_date returns GetNotesNotesNote.Last_edited_date, and is useful for accessing the field via an interface.
 func (v *GetNotesNotesNote) GetLast_edited_date() time.Time { return v.Last_edited_date }
+
+// GetTag_id returns GetNotesNotesNote.Tag_id, and is useful for accessing the field via an interface.
+func (v *GetNotesNotesNote) GetTag_id() *int64 { return v.Tag_id }
 
 // GetNotesResponse is returned by GetNotes on success.
 type GetNotesResponse struct {
@@ -218,12 +230,19 @@ func (v *SaveNoteResponse) GetSaveNote() SaveNoteSaveNote { return v.SaveNote }
 
 // SaveNoteSaveNote includes the requested fields of the GraphQL type Note.
 type SaveNoteSaveNote struct {
+	Id               int64     `json:"id"`
+	Title            string    `json:"title"`
 	Content          string    `json:"content"`
 	Created_date     time.Time `json:"created_date"`
-	Id               int64     `json:"id"`
 	Last_edited_date time.Time `json:"last_edited_date"`
-	Title            string    `json:"title"`
+	Tag_id           *int64    `json:"tag_id"`
 }
+
+// GetId returns SaveNoteSaveNote.Id, and is useful for accessing the field via an interface.
+func (v *SaveNoteSaveNote) GetId() int64 { return v.Id }
+
+// GetTitle returns SaveNoteSaveNote.Title, and is useful for accessing the field via an interface.
+func (v *SaveNoteSaveNote) GetTitle() string { return v.Title }
 
 // GetContent returns SaveNoteSaveNote.Content, and is useful for accessing the field via an interface.
 func (v *SaveNoteSaveNote) GetContent() string { return v.Content }
@@ -231,22 +250,59 @@ func (v *SaveNoteSaveNote) GetContent() string { return v.Content }
 // GetCreated_date returns SaveNoteSaveNote.Created_date, and is useful for accessing the field via an interface.
 func (v *SaveNoteSaveNote) GetCreated_date() time.Time { return v.Created_date }
 
-// GetId returns SaveNoteSaveNote.Id, and is useful for accessing the field via an interface.
-func (v *SaveNoteSaveNote) GetId() int64 { return v.Id }
-
 // GetLast_edited_date returns SaveNoteSaveNote.Last_edited_date, and is useful for accessing the field via an interface.
 func (v *SaveNoteSaveNote) GetLast_edited_date() time.Time { return v.Last_edited_date }
 
-// GetTitle returns SaveNoteSaveNote.Title, and is useful for accessing the field via an interface.
-func (v *SaveNoteSaveNote) GetTitle() string { return v.Title }
+// GetTag_id returns SaveNoteSaveNote.Tag_id, and is useful for accessing the field via an interface.
+func (v *SaveNoteSaveNote) GetTag_id() *int64 { return v.Tag_id }
+
+// SetNoteTagResponse is returned by SetNoteTag on success.
+type SetNoteTagResponse struct {
+	SetNoteTag SetNoteTagSetNoteTagNote `json:"SetNoteTag"`
+}
+
+// GetSetNoteTag returns SetNoteTagResponse.SetNoteTag, and is useful for accessing the field via an interface.
+func (v *SetNoteTagResponse) GetSetNoteTag() SetNoteTagSetNoteTagNote { return v.SetNoteTag }
+
+// SetNoteTagSetNoteTagNote includes the requested fields of the GraphQL type Note.
+type SetNoteTagSetNoteTagNote struct {
+	Id               int64     `json:"id"`
+	Title            string    `json:"title"`
+	Content          string    `json:"content"`
+	Created_date     time.Time `json:"created_date"`
+	Last_edited_date time.Time `json:"last_edited_date"`
+	Tag_id           *int64    `json:"tag_id"`
+}
+
+// GetId returns SetNoteTagSetNoteTagNote.Id, and is useful for accessing the field via an interface.
+func (v *SetNoteTagSetNoteTagNote) GetId() int64 { return v.Id }
+
+// GetTitle returns SetNoteTagSetNoteTagNote.Title, and is useful for accessing the field via an interface.
+func (v *SetNoteTagSetNoteTagNote) GetTitle() string { return v.Title }
+
+// GetContent returns SetNoteTagSetNoteTagNote.Content, and is useful for accessing the field via an interface.
+func (v *SetNoteTagSetNoteTagNote) GetContent() string { return v.Content }
+
+// GetCreated_date returns SetNoteTagSetNoteTagNote.Created_date, and is useful for accessing the field via an interface.
+func (v *SetNoteTagSetNoteTagNote) GetCreated_date() time.Time { return v.Created_date }
+
+// GetLast_edited_date returns SetNoteTagSetNoteTagNote.Last_edited_date, and is useful for accessing the field via an interface.
+func (v *SetNoteTagSetNoteTagNote) GetLast_edited_date() time.Time { return v.Last_edited_date }
+
+// GetTag_id returns SetNoteTagSetNoteTagNote.Tag_id, and is useful for accessing the field via an interface.
+func (v *SetNoteTagSetNoteTagNote) GetTag_id() *int64 { return v.Tag_id }
 
 // __CreateNoteInput is used internally by genqlient
 type __CreateNoteInput struct {
 	Title string `json:"title"`
+	TagId *int64 `json:"tagId"`
 }
 
 // GetTitle returns __CreateNoteInput.Title, and is useful for accessing the field via an interface.
 func (v *__CreateNoteInput) GetTitle() string { return v.Title }
+
+// GetTagId returns __CreateNoteInput.TagId, and is useful for accessing the field via an interface.
+func (v *__CreateNoteInput) GetTagId() *int64 { return v.TagId }
 
 // __CreateTagInput is used internally by genqlient
 type __CreateTagInput struct {
@@ -296,26 +352,41 @@ type __SaveNoteInput struct {
 // GetNote returns __SaveNoteInput.Note, and is useful for accessing the field via an interface.
 func (v *__SaveNoteInput) GetNote() Note_InputObject { return v.Note }
 
+// __SetNoteTagInput is used internally by genqlient
+type __SetNoteTagInput struct {
+	NoteId int64 `json:"noteId"`
+	TagId  int64 `json:"tagId"`
+}
+
+// GetNoteId returns __SetNoteTagInput.NoteId, and is useful for accessing the field via an interface.
+func (v *__SetNoteTagInput) GetNoteId() int64 { return v.NoteId }
+
+// GetTagId returns __SetNoteTagInput.TagId, and is useful for accessing the field via an interface.
+func (v *__SetNoteTagInput) GetTagId() int64 { return v.TagId }
+
 func CreateNote(
 	ctx context.Context,
 	client graphql.Client,
 	title string,
+	tagId *int64,
 ) (*CreateNoteResponse, error) {
 	req := &graphql.Request{
 		OpName: "CreateNote",
 		Query: `
-mutation CreateNote ($title: string!) {
-	CreateNote(title: $title) {
+mutation CreateNote ($title: string!, $tagId: int64) {
+	CreateNote(title: $title, tag_id: $tagId) {
+		id
+		title
 		content
 		created_date
-		id
 		last_edited_date
-		title
+		tag_id
 	}
 }
 `,
 		Variables: &__CreateNoteInput{
 			Title: title,
+			TagId: tagId,
 		},
 	}
 	var err error
@@ -440,6 +511,7 @@ query GetNote ($noteId: int64!) {
 		content
 		created_date
 		last_edited_date
+		tag_id
 	}
 }
 `,
@@ -475,6 +547,7 @@ query GetNotes {
 		content
 		created_date
 		last_edited_date
+		tag_id
 	}
 }
 `,
@@ -565,11 +638,12 @@ func SaveNote(
 		Query: `
 mutation SaveNote ($note: Note_InputObject!) {
 	SaveNote(note: $note) {
+		id
+		title
 		content
 		created_date
-		id
 		last_edited_date
-		title
+		tag_id
 	}
 }
 `,
@@ -580,6 +654,45 @@ mutation SaveNote ($note: Note_InputObject!) {
 	var err error
 
 	var data SaveNoteResponse
+	resp := &graphql.Response{Data: &data}
+
+	err = client.MakeRequest(
+		ctx,
+		req,
+		resp,
+	)
+
+	return &data, err
+}
+
+func SetNoteTag(
+	ctx context.Context,
+	client graphql.Client,
+	noteId int64,
+	tagId int64,
+) (*SetNoteTagResponse, error) {
+	req := &graphql.Request{
+		OpName: "SetNoteTag",
+		Query: `
+mutation SetNoteTag ($noteId: int64!, $tagId: int64!) {
+	SetNoteTag(note_id: $noteId, tag_id: $tagId) {
+		id
+		title
+		content
+		created_date
+		last_edited_date
+		tag_id
+	}
+}
+`,
+		Variables: &__SetNoteTagInput{
+			NoteId: noteId,
+			TagId:  tagId,
+		},
+	}
+	var err error
+
+	var data SetNoteTagResponse
 	resp := &graphql.Response{Data: &data}
 
 	err = client.MakeRequest(

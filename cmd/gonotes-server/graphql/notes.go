@@ -28,11 +28,15 @@ func (g *NotesGql) registerQuery(querySchemaObj *schemabuilder.Object) {
 
 func (g *NotesGql) registerMutation(mutationSchemaObj *schemabuilder.Object) {
 	mutationSchemaObj.FieldFunc("CreateNote", func(args input.CreateNote) (model.Note, error) {
-		return g.NotesService.CreateNote(args.Title)
+		return g.NotesService.CreateNote(args.Title, args.TagID)
 	})
 
 	mutationSchemaObj.FieldFunc("SaveNote", func(args input.SaveNote) (model.Note, error) {
 		return g.NotesService.SaveNote(args.Note)
+	})
+
+	mutationSchemaObj.FieldFunc("SetNoteTag", func(args input.SetNoteTag) (model.Note, error) {
+		return g.NotesService.SetNoteTag(args.NoteID, args.TagID)
 	})
 
 	mutationSchemaObj.FieldFunc("DeleteNote", func(args input.DeleteNote) error {

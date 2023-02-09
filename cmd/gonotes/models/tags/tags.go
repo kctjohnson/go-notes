@@ -13,10 +13,10 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type TagsState int
+type State int
 
 const (
-	LIST TagsState = iota
+	LIST State = iota
 	NEW
 )
 
@@ -25,9 +25,9 @@ type Tags struct {
 	width  int
 	height int
 	help   help.Model
-	State  TagsState
+	State  State
 
-	activeFilterTag int
+	ActiveFilterTag int
 	cursor          int
 	scrollIndex     int
 	maxViewTags     int
@@ -52,7 +52,7 @@ func New(gqlClient *graphql.Client) *Tags {
 		height:          maxHeight,
 		help:            help.New(),
 		State:           LIST,
-		activeFilterTag: 0,
+		ActiveFilterTag: 0,
 		cursor:          0,
 		scrollIndex:     0,
 		maxViewTags:     maxHeight,
@@ -82,10 +82,10 @@ func (m Tags) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case key.Matches(msg, Keys.Down):
 				m.cursorDown()
 			case key.Matches(msg, Keys.Toggle):
-				if m.cursor == m.activeFilterTag {
-					m.activeFilterTag = 0
+				if m.cursor == m.ActiveFilterTag {
+					m.ActiveFilterTag = 0
 				} else {
-					m.activeFilterTag = m.cursor
+					m.ActiveFilterTag = m.cursor
 				}
 			case key.Matches(msg, Keys.New):
 				m.State = NEW
@@ -96,8 +96,8 @@ func (m Tags) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				if m.cursor != 0 {
 					toDelete := m.Tags[m.cursor].ID
 					// Set the active filter back to all if they delete the active filter
-					if m.cursor == m.activeFilterTag {
-						m.activeFilterTag = 0
+					if m.cursor == m.ActiveFilterTag {
+						m.ActiveFilterTag = 0
 					}
 					return m, utils.DeleteTagCmd(m.gqlClient, toDelete)
 				}
@@ -148,15 +148,15 @@ func (m Tags) viewList() string {
 	str := utils.TitleStyle.Render("Tags:") + "\n"
 	for row := m.scrollIndex; row < len(m.Tags) && row < m.scrollIndex+m.maxViewTags; row++ {
 		line := m.Tags[row].Name
-		if row == m.activeFilterTag && row == m.cursor {
+		if row == m.ActiveFilterTag && row == m.cursor {
 			line = utils.FocusedLineStyle.Copy().Inherit(utils.UnderlinedStyle).Render(line)
-		} else if row == m.activeFilterTag {
+		} else if row == m.ActiveFilterTag {
 			line = utils.FocusedLineStyle.Render(line)
 		} else if row == m.cursor {
 			line = utils.UnderlinedStyle.Render(line)
 		}
 
-		if row == m.activeFilterTag {
+		if row == m.ActiveFilterTag {
 			str += fmt.Sprintf("%s\n", line)
 		} else {
 			str += fmt.Sprintf("%s\n", line)

@@ -53,10 +53,10 @@ func (r *NotesRepository) GetNote(id int64) (model.Note, error) {
 	return note, nil
 }
 
-func (r *NotesRepository) CreateNote(title string) (model.Note, error) {
+func (r *NotesRepository) CreateNote(title string, tagID *int64) (model.Note, error) {
 	const createNoteSql = `
-	INSERT INTO notes (title, content, created_date, last_edited_date)
-	VALUES (:title, :content, :created_date, :last_edited_date)
+	INSERT INTO notes (title, content, created_date, last_edited_date, tag_id)
+	VALUES (:title, :content, :created_date, :last_edited_date, :tag_id)
 	`
 
 	curDate := time.Now()
@@ -64,6 +64,7 @@ func (r *NotesRepository) CreateNote(title string) (model.Note, error) {
 		Title:          title,
 		CreatedDate:    curDate,
 		LastEditedDate: curDate,
+		TagID:          tagID,
 	}
 
 	res, err := r.db.NamedExec(createNoteSql, newNote)
@@ -110,4 +111,23 @@ func (r *NotesRepository) DeleteNote(id int64) error {
 	const deleteNoteSql = `DELETE FROM notes WHERE id=?`
 	_, err := r.db.Exec(deleteNoteSql, id)
 	return err
+}
+
+func (r *NotesRepository) SetNoteTag(noteID, tagID int64) (model.Note, error) {
+	const setNoteTagSql = `
+		UPDATE notes
+		SET tag_id=?
+		WHERE id=?
+	`
+	_, err := r.db.Exec(setNoteTagSql, tagID, noteID)
+	if err != nil {
+		return model.Note{}, err
+	}
+
+	updatedNote, err := r.GetNote(noteID)
+	if err != nil {
+		return updatedNote, err
+	}
+
+	return updatedNote, nil
 }

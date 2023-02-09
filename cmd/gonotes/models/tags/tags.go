@@ -5,6 +5,7 @@ import (
 	"go-notes/cmd/gonotes/utils"
 	"go-notes/internal/db/model"
 	"go-notes/internal/graphql"
+	"math"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -167,7 +168,26 @@ func (m Tags) viewList() string {
 }
 
 func (m Tags) viewInput() string {
-	str := m.input.View()
+	str := utils.TitleStyle.Render("Set Tag Filter:") + "\n"
+	topIndex := int(math.Max(float64(len(m.Tags)-m.maxViewTags)+1, 0))
+	for row := topIndex; row < len(m.Tags) && row < topIndex+m.maxViewTags; row++ {
+		line := m.Tags[row].Name
+		if row == m.ActiveFilterTag && row == m.cursor {
+			line = utils.FocusedLineStyle.Copy().Inherit(utils.UnderlinedStyle).Render(line)
+		} else if row == m.ActiveFilterTag {
+			line = utils.FocusedLineStyle.Render(line)
+		} else if row == m.cursor {
+			line = utils.UnderlinedStyle.Render(line)
+		}
+
+		if row == m.ActiveFilterTag {
+			str += fmt.Sprintf("%s\n", line)
+		} else {
+			str += fmt.Sprintf("%s\n", line)
+		}
+	}
+	str += m.input.View()
+	str += "\n\n" + m.help.View(InputKeys)
 	return str
 }
 

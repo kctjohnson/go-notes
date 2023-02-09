@@ -145,7 +145,7 @@ func (m Tags) View() string {
 }
 
 func (m Tags) viewList() string {
-	str := utils.TitleStyle.Render("Tags:") + "\n"
+	str := utils.TitleStyle.Render("Set Tag Filter:") + "\n"
 	for row := m.scrollIndex; row < len(m.Tags) && row < m.scrollIndex+m.maxViewTags; row++ {
 		line := m.Tags[row].Name
 		if row == m.ActiveFilterTag && row == m.cursor {

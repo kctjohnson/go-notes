@@ -10,7 +10,7 @@ type listKeymap struct {
 	Select   key.Binding
 	New      key.Binding
 	Delete   key.Binding
-	Tags     key.Binding
+	Filter   key.Binding
 	SetTag   key.Binding
 	Help     key.Binding
 	Quit     key.Binding
@@ -23,7 +23,7 @@ func (k listKeymap) ShortHelp() []key.Binding {
 func (k listKeymap) FullHelp() [][]key.Binding {
 	return [][]key.Binding{
 		{k.Up, k.New, k.ViewUp, k.Select, k.Help},
-		{k.Down, k.Delete, k.ViewDown, k.Tags, k.SetTag, k.Quit},
+		{k.Down, k.Delete, k.ViewDown, k.Filter, k.SetTag, k.Quit},
 	}
 }
 
@@ -56,13 +56,13 @@ var Keys = listKeymap{
 		key.WithKeys("D"),
 		key.WithHelp("D", "Delete"),
 	),
-	Tags: key.NewBinding(
-		key.WithKeys("t"),
-		key.WithHelp("t", "Tags"),
+	Filter: key.NewBinding(
+		key.WithKeys("f"),
+		key.WithHelp("f", "Filter"),
 	),
 	SetTag: key.NewBinding(
-		key.WithKeys("ctrl+t"),
-		key.WithHelp("ctrl+t", "Set Tag"),
+		key.WithKeys("t"),
+		key.WithHelp("t", "Set Tag"),
 	),
 	Help: key.NewBinding(
 		key.WithKeys("?"),

@@ -54,7 +54,7 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		switch m.curState {
 		case LIST:
 			switch {
-			case key.Matches(msg, list.Keys.Tags):
+			case key.Matches(msg, list.Keys.Filter):
 				m.curState = TAGS
 				return m, nil
 			}

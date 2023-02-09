@@ -23,7 +23,7 @@ func (k inputKeymap) FullHelp() [][]key.Binding {
 var InputKeys = inputKeymap{
 	Create: key.NewBinding(
 		key.WithKeys("enter"),
-		key.WithHelp("<enter>", "Create"),
+		key.WithHelp("Enter", "Create"),
 	),
 	Back: key.NewBinding(
 		key.WithKeys("esc", "q"),

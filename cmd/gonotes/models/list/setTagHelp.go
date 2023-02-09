@@ -30,8 +30,8 @@ var SetTagKeys = setTagKeymap{
 		key.WithHelp("↓/j", "Down"),
 	),
 	Select: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("Enter", "Select"),
+		key.WithKeys("enter", " "),
+		key.WithHelp("Space", "Select"),
 	),
 	Back: key.NewBinding(
 		key.WithKeys("esc", "q"),

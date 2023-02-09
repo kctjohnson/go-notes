@@ -37,6 +37,7 @@ func (m SetTag) Init() tea.Cmd {
 }
 
 func (m SetTag) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	m.constrainCursor()
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {

@@ -131,3 +131,16 @@ func (r *NotesRepository) SetNoteTag(noteID, tagID int64) (model.Note, error) {
 
 	return updatedNote, nil
 }
+
+func (r *NotesRepository) ClearTagFromNotes(tagID int64) error {
+	const clearTagFromNotesSql = `
+		UPDATE notes
+		SET tag_id=null
+		WHERE tag_id=?
+	`
+	_, err := r.db.Exec(clearTagFromNotesSql, tagID)
+	if err != nil {
+		return err
+	}
+	return nil
+}

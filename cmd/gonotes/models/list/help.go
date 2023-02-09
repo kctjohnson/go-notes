@@ -45,8 +45,8 @@ var Keys = listKeymap{
 		key.WithHelp("⇧+↓/J", "Preview Down"),
 	),
 	Select: key.NewBinding(
-		key.WithKeys("enter"),
-		key.WithHelp("Enter", "Select"),
+		key.WithKeys("enter", " "),
+		key.WithHelp("Space", "Select"),
 	),
 	New: key.NewBinding(
 		key.WithKeys("N"),

@@ -174,7 +174,9 @@ func (m List) listView() string {
 						tag = t
 					}
 				}
-				str += fmt.Sprintf(" [%s]", tag.Name)
+				if tag.ID != -1 {
+					str += fmt.Sprintf(" [%s]", tag.Name)
+				}
 			}
 		}
 		str += "\n"

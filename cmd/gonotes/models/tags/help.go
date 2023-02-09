@@ -37,7 +37,7 @@ var Keys = tagsKeymap{
 	),
 	Toggle: key.NewBinding(
 		key.WithKeys(" ", "enter"),
-		key.WithHelp("<space>/<enter>", "Toggle"),
+		key.WithHelp("Space", "Toggle"),
 	),
 	New: key.NewBinding(
 		key.WithKeys("N"),

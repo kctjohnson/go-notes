@@ -1,0 +1,6 @@
+query GetTag($tagId: int64!){
+  Tag(id: $tagId) {
+    id
+    name
+  }
+}

@@ -1,6 +1,7 @@
 schema: ./internal/graphql/schema.graphql
 operations:
   - ./internal/graphql/note/**/*.graphql
+  - ./internal/graphql/tag/**/*.graphql
 generated: ./internal/graphql/generated.go
 optional: pointer
 bindings:

@@ -3,6 +3,8 @@ package models
 import (
 	"bufio"
 	"fmt"
+	"go-notes/cmd/gonotes/models/list"
+	"go-notes/cmd/gonotes/models/tags"
 	"go-notes/cmd/gonotes/utils"
 	"go-notes/internal/db/model"
 	"go-notes/internal/graphql"
@@ -12,48 +14,75 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/bubbles/key"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type FocusEnum int
+type StateEnum int
 
 const (
-	LIST FocusEnum = iota
+	LIST StateEnum = iota
+	TAGS
 	LOADING
 )
 
 type Main struct {
 	gqlClient *graphql.Client
-	list      List
-	curFocus  FocusEnum
+	list      list.List
+	tags      tags.Tags
+	curState  StateEnum
+	prevState StateEnum
 }
 
 func NewMain(gqlClient *graphql.Client) *Main {
 	return &Main{
 		gqlClient: gqlClient,
-		list:      *NewList(listKeys, gqlClient),
-		curFocus:  LOADING,
+		list:      *list.New(gqlClient),
+		tags:      *tags.New(gqlClient),
+		curState:  LOADING,
 	}
 }
 
 func (m Main) Init() tea.Cmd {
-	return utils.LoadNotesCmd(m.gqlClient)
+	return tea.Batch(utils.LoadNotesCmd(m.gqlClient), utils.LoadTagsCmd(m.gqlClient))
 }
 
 func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmds tea.Cmd
 	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch m.curState {
+		case LIST:
+			switch {
+			case key.Matches(msg, list.Keys.Filter):
+				m.curState = TAGS
+				return m, nil
+			}
+		case TAGS:
+			if m.tags.State == tags.LIST {
+				switch {
+				case key.Matches(msg, tags.Keys.Back):
+					if m.tags.ActiveFilterTag != 0 {
+						m.list.SetFilter(&m.tags.Tags[m.tags.ActiveFilterTag])
+					} else {
+						m.list.RemoveFilter()
+					}
+					m.curState = LIST
+					return m, nil
+				}
+			}
+		}
 	case utils.FailedToLoadNotesMsg:
 		log.Fatalf("Failed to load notes!\nError: %v\n", msg)
 		return m, tea.Quit
 	case utils.LoadedNotesMsg:
-		m.list.notes = msg
-		m.curFocus = LIST
+		m.list.Notes = msg
+		m.curState = LIST
 	case utils.FailedToCreateNoteMsg:
 		log.Fatalf("Failed to create note!\nError: %v\n", msg)
 		return m, tea.Quit
 	case utils.CreatedNoteMsg:
-		m.curFocus = LOADING
+		m.curState = LOADING
 		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
 	case utils.FailedToEditNoteMsg:
 		log.Fatalf("Failed to edit note!\nError: %v\n", msg)
@@ -71,14 +100,45 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		return m, m.saveNote(msg.Note, msg.F)
 	case utils.SaveNoteMsg:
-		m.curFocus = LOADING
+		m.curState = LOADING
 		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
 	case utils.FailedToDeleteNoteMsg:
 		log.Fatalf("Failed to delete note!\nError: %v\n", msg)
 		return m, tea.Quit
 	case utils.DeletedNoteMsg:
-		m.curFocus = LOADING
+		m.curState = LOADING
 		cmds = tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
+	case utils.FailedToLoadTagsMsg:
+		log.Fatalf("Failed to load tags!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.LoadedTagsMsg:
+		m.tags.Tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
+		m.list.SetTag.Tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
+		m.curState = TAGS
+	case utils.FailedToLoadSetTagsMsg:
+		log.Fatalf("Failed to load tags!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.LoadedSetTagsMsg:
+		m.list.SetTag.Tags = append([]model.Tag{{ID: -1, Name: "All"}}, msg...)
+		m.curState = LIST
+	case utils.FailedToSetNoteTagMsg:
+		log.Fatalf("Failed to set tag on note!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.SetNoteTagMsg:
+		m.curState = LIST
+		return m, tea.Batch(cmds, utils.LoadNotesCmd(m.gqlClient))
+	case utils.FailedToCreateTagMsg:
+		log.Fatalf("Failed to create tag!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.CreatedTagMsg:
+		m.curState = LOADING
+		return m, tea.Batch(cmds, utils.LoadTagsCmd(m.gqlClient))
+	case utils.FailedToDeleteTagMsg:
+		log.Fatalf("Failed to delete tag!\nError: %v\n", msg)
+		return m, tea.Quit
+	case utils.DeletedTagMsg:
+		m.curState = LOADING
+		return m, tea.Batch(cmds, utils.LoadTagsCmd(m.gqlClient))
 	}
 
 	// Update all of the delegated models
@@ -90,13 +150,23 @@ func (m Main) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m Main) View() string {
-	switch m.curFocus {
+	switch m.curState {
 	case LOADING:
 		return "Loading the notes..."
 	case LIST:
 		return m.list.View()
+	case TAGS:
+		return m.tags.View()
 	default:
 		return "I'm not sure what else we should be doing, but here we are!"
+	}
+}
+
+// Sets the current and previous state of the model
+func (m *Main) setState(state StateEnum) {
+	if m.curState != state {
+		m.prevState = m.curState
+		m.curState = state
 	}
 }
 
@@ -104,15 +174,21 @@ func (m Main) View() string {
 func (m Main) modelUpdate(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Delegate the window size messages
 	if _, ok := msg.(tea.WindowSizeMsg); ok {
-		listModel, cmd := m.list.Update(msg)
-		m.list = listModel.(List)
-		return m, cmd
+		tagsModel, tagsCmd := m.tags.Update(msg)
+		m.tags = tagsModel.(tags.Tags)
+		listModel, listCmd := m.list.Update(msg)
+		m.list = listModel.(list.List)
+		return m, tea.Batch(listCmd, tagsCmd)
 	}
 
-	switch m.curFocus {
+	switch m.curState {
 	case LIST:
 		listModel, cmd := m.list.Update(msg)
-		m.list = listModel.(List)
+		m.list = listModel.(list.List)
+		return m, cmd
+	case TAGS:
+		tagsModel, cmd := m.tags.Update(msg)
+		m.tags = tagsModel.(tags.Tags)
 		return m, cmd
 	}
 	return m, nil

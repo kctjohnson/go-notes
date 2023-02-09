@@ -1,0 +1,6 @@
+mutation CreateTag($name: string!) {
+  CreateTag(name: $name) {
+    id
+    name
+  }
+}

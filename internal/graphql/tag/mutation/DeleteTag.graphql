@@ -1,0 +1,3 @@
+mutation DeleteTag($id: int64!) {
+  DeleteTag(id: $id)
+}

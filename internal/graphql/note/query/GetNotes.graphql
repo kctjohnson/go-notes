@@ -1,9 +1,10 @@
 query GetNotes {
-  notes {
+  Notes {
     id
     title
     content
     created_date
     last_edited_date
+    tag_id
   }
 }

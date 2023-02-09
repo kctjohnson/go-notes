@@ -1,13 +1,22 @@
 """"""
 type Mutation {
   """"""
-  createNote(title: string!): Note! @deprecated(reason: "")
+  CreateNote(tag_id: int64, title: string!): Note! @deprecated(reason: "")
 
   """"""
-  deleteNote(iD: int64!): bool! @deprecated(reason: "")
+  CreateTag(name: string!): Tag! @deprecated(reason: "")
 
   """"""
-  saveNote(note: Note_InputObject!): Note! @deprecated(reason: "")
+  DeleteNote(id: int64!): bool! @deprecated(reason: "")
+
+  """"""
+  DeleteTag(id: int64!): bool! @deprecated(reason: "")
+
+  """"""
+  SaveNote(note: Note_InputObject!): Note! @deprecated(reason: "")
+
+  """"""
+  SetNoteTag(note_id: int64!, tag_id: int64!): Note! @deprecated(reason: "")
 }
 
 """"""
@@ -23,6 +32,9 @@ type Note {
 
   """"""
   last_edited_date: Time! @deprecated(reason: "")
+
+  """"""
+  tag_id: int64 @deprecated(reason: "")
 
   """"""
   title: string! @deprecated(reason: "")
@@ -43,16 +55,34 @@ input Note_InputObject {
   last_edited_date: Time!
 
   """"""
+  tag_id: int64
+
+  """"""
   title: string!
 }
 
 """"""
 type Query {
   """"""
-  note(id: int64!): Note! @deprecated(reason: "")
+  Note(id: int64!): Note! @deprecated(reason: "")
 
   """"""
-  notes: [Note!]! @deprecated(reason: "")
+  Notes: [Note!]! @deprecated(reason: "")
+
+  """"""
+  Tag(id: int64!): Tag! @deprecated(reason: "")
+
+  """"""
+  Tags: [Tag!]! @deprecated(reason: "")
+}
+
+""""""
+type Tag {
+  """"""
+  id: int64! @deprecated(reason: "")
+
+  """"""
+  name: string! @deprecated(reason: "")
 }
 
 """"""

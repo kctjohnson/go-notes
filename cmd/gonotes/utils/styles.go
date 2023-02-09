@@ -3,7 +3,8 @@ package utils
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	FocusedNoteStyle = lipgloss.NewStyle().
+	UnderlinedStyle  = lipgloss.NewStyle().Underline(true)
+	FocusedLineStyle = lipgloss.NewStyle().
 				Foreground(lipgloss.Color("69")).
 				Bold(true)
 	TitleStyle = lipgloss.NewStyle().

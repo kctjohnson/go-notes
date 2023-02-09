@@ -1,9 +1,10 @@
-mutation CreateNote($title: string!) {
-  createNote(title: $title) {
+mutation CreateNote($title: string!, $tagId: int64) {
+  CreateNote(title: $title, tag_id: $tagId) {
+    id
+    title
     content
     created_date
-    id
     last_edited_date
-    title
+    tag_id
   }
 }

@@ -3,20 +3,27 @@ package main
 import (
 	"fmt"
 	"go-notes/cmd/gonotes/models"
+	"go-notes/internal/config"
+	"go-notes/internal/graphql"
 	"log"
 	"net/http"
 	"os"
-
-	"go-notes/internal/config"
-	"go-notes/internal/graphql"
 
 	tea "github.com/charmbracelet/bubbletea"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+	logPath := "/.config/gonotes/"
+	logName := "debug.log"
+	logFullPath := homeDir + logPath + logName
+
 	// Set up logging
-	f, err := tea.LogToFile("debug.log", "debug")
+	f, err := tea.LogToFile(logFullPath, "debug")
 	if err != nil {
 		fmt.Println("fatal: ", err)
 		os.Exit(1)
